@@ -1,0 +1,43 @@
+1
+00:00:00,000 --> 00:00:15,000
+Anyone can build a trading strategy with a three-hundred-percent backtest. Almost none survive live. The reason isn't bad code — it's selection bias.
+
+2
+00:00:15,000 --> 00:00:40,000
+We ran one thousand random, zero-skill strategies on real S&P data. The best backtest looks great — a Sharpe of 0.61. It's pure luck, and the math knows it.
+
+3
+00:00:40,000 --> 00:00:42,300
+Mirage backtests your strategy grid on real market data with realistic costs — and remembers every single trial.
+
+4
+00:00:42,300 --> 00:00:54,500
+Every trial lands in a tamper-evident Trial Ledger: pre-registration for backtests. You can't quietly delete the losers. Then the overfitting battery runs: Deflated Sharpe Ratio, CSCV, Reality Check.
+
+5
+00:00:54,500 --> 00:01:10,567
+The verdict card: PBO — the probability the in-sample winner underperforms out of sample — is sixty-five percent. This grid is a mirage.
+
+6
+00:01:10,567 --> 00:01:17,834
+Every trial is hash-chained — timestamp, config hash, data hash. Export a pre-registration certificate any third party can verify.
+
+7
+00:01:17,834 --> 00:01:28,601
+Already used another backtester? Upload your returns and a trial count — Mirage audits the field, not just its own runs.
+
+8
+00:01:28,601 --> 00:01:39,701
+Every method is from the published literature — Deflated Sharpe Ratio, CSCV, White's Reality Check, purged cross-validation — with formulas and citations on the methods page.
+
+9
+00:01:39,701 --> 00:02:01,701
+And Mirage validates itself — planted-skill experiments measure the detector's own ROC AUC at point eight.
+
+10
+00:02:01,701 --> 00:02:21,701
+DSR alone misses half of zero-skill zoos — the combined battery misses only five percent. The verdict is a battery, not a number.
+
+11
+00:02:21,701 --> 00:02:33,701
+Mirage — free, open source, MIT licensed. Stop trusting your own backtests.

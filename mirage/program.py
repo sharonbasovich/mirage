@@ -218,7 +218,8 @@ def analyze_trials(
             "narrative": verdict.narrative,
         },
         "equity_curves": {
-            "dates": [str(d.date()) for d in eq.index],
+            "dates": [str(d.date()) if hasattr(d, "date") else str(d)
+                      for d in eq.index],
             "best": eq.iloc[:, best_i].round(4).tolist(),
         },
         "trials": [
