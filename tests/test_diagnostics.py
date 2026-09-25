@@ -1,7 +1,6 @@
 """Analytic/sanity tests for the diagnostics battery."""
 
 import numpy as np
-import pandas as pd
 import pytest
 
 from mirage.diagnostics.costs import cost_fragility

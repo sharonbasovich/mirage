@@ -2,7 +2,6 @@
 
 import numpy as np
 import pandas as pd
-import pytest
 
 from mirage.backtest import perf_stats, run_backtest
 from mirage.ledger import Ledger, new_program_id

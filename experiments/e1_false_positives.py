@@ -11,7 +11,7 @@ import json
 
 import numpy as np
 
-from experiments.common import FIGS, REPORTS, fig, random_signal_matrix, save
+from experiments.common import REPORTS, fig, random_signal_matrix, save
 from mirage.data import load_close
 from mirage.diagnostics.cscv import cscv_pbo
 from mirage.diagnostics.sharpe import dsr, dsr_expected_max_sharpe, psr, sharpe_ratio

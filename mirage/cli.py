@@ -4,21 +4,20 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
 import typer
 
 from mirage.data import SYMBOLS, data_hash
-from mirage.ledger import Ledger, new_program_id
-from mirage.program import TrialResult, analyze_returns_matrix, analyze_trials, run_program
+from mirage.ledger import Ledger
+from mirage.program import analyze_returns_matrix, analyze_trials, run_program
 from mirage.strategies import STRATEGIES
 
 app = typer.Typer(help="Mirage - the backtest lie detector", no_args_is_help=True)
 
 
-def _parse_grid(grid: Optional[str]) -> dict | None:
+def _parse_grid(grid: str | None) -> dict | None:
     """'fast=5,10;slow=100,200' -> {'fast': [5,10], 'slow': [100,200]}."""
     if not grid:
         return None
@@ -27,7 +26,7 @@ def _parse_grid(grid: Optional[str]) -> dict | None:
         if not part.strip():
             continue
         k, vs = part.split("=")
-        vals = []
+        vals: list[int | float | bool | str] = []
         for v in vs.split(","):
             v = v.strip()
             try:
@@ -45,9 +44,9 @@ def _parse_grid(grid: Optional[str]) -> dict | None:
 def run(
     family: str = typer.Argument(..., help=f"strategy family: {sorted(STRATEGIES)}"),
     symbols: str = typer.Option("SPY", help="comma-separated symbols"),
-    grid: Optional[str] = typer.Option(None, help="e.g. 'fast=5,10;slow=100,200'"),
+    grid: str | None = typer.Option(None, help="e.g. 'fast=5,10;slow=100,200'"),
     cost_bps: float = typer.Option(5.0),
-    program: Optional[str] = typer.Option(None, help="existing program id to append to"),
+    program: str | None = typer.Option(None, help="existing program id to append to"),
     analyze: bool = typer.Option(True, help="run diagnostics after trials"),
 ):
     """Run a parameter grid; every trial lands in the tamper-evident ledger."""
@@ -71,7 +70,7 @@ def run(
 def audit(
     csv: Path = typer.Argument(..., help="CSV of daily returns; one column per trial"),
     trials: int = typer.Option(..., "--trials", "-n", help="declared total trials tried"),
-    benchmark: Optional[str] = typer.Option(None, help="symbol to use as benchmark"),
+    benchmark: str | None = typer.Option(None, help="symbol to use as benchmark"),
     date_col: str = typer.Option("Date"),
 ):
     """Audit an external backtest: upload returns + declared trial count."""
@@ -110,7 +109,7 @@ def audit(
 @app.command()
 def report(
     program: str = typer.Argument(..., help="program id"),
-    out: Optional[Path] = typer.Option(None, help="write certificate JSON here"),
+    out: Path | None = typer.Option(None, help="write certificate JSON here"),
 ):
     """Print the pre-registration certificate for a recorded program."""
     led = Ledger()
@@ -137,7 +136,7 @@ def programs():
 
 @app.command()
 def experiments(
-    only: Optional[str] = typer.Option(None, help="e1|e2|e3"),
+    only: str | None = typer.Option(None, help="e1|e2|e3"),
 ):
     """Run the self-validation experiments (writes reports/)."""
     from experiments.run_all import main as run_all

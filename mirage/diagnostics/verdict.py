@@ -115,7 +115,7 @@ def build_verdict(
         len_detail = f"{n_days} days vs minimum {min_btl:.0f} required"
     else:
         s_len = 0.0
-        len_detail = f"minimum length unbounded (Sharpe <= benchmark)"
+        len_detail = "minimum length unbounded (Sharpe <= benchmark)"
     comps.append(Component("length", "Backtest length", WEIGHTS["length"], s_len, len_detail))
     if np.isfinite(min_btl) and n_days < min_btl:
         narrative.append(

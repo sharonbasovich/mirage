@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import itertools
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
 import pandas as pd
 
@@ -49,7 +50,7 @@ def param_grid(grid: dict[str, list[Any]]) -> list[dict[str, Any]]:
     keys = list(grid.keys())
     out = []
     for combo in itertools.product(*(grid[k] for k in keys)):
-        out.append(dict(zip(keys, combo)))
+        out.append(dict(zip(keys, combo, strict=False)))
     return out
 
 

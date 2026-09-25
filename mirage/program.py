@@ -30,7 +30,7 @@ from mirage.diagnostics.sharpe import (
 )
 from mirage.diagnostics.verdict import build_verdict
 from mirage.ledger import Ledger, new_program_id
-from mirage.strategies import STRATEGIES, build_strategy, param_grid
+from mirage.strategies import build_strategy, param_grid
 
 
 @dataclass
@@ -181,7 +181,7 @@ def analyze_trials(
         "best_config": best.config,
         "best_metrics": best.metrics,
         "best_sharpe": best_is_sharpe,
-        "trial_sharpes": {c: float(s) for c, s in zip(rets.columns, trial_sharpes)},
+        "trial_sharpes": {c: float(s) for c, s in zip(rets.columns, trial_sharpes, strict=False)},
         "psr": psr_p,
         "dsr": dsr_p,
         "dsr_threshold": e_max,

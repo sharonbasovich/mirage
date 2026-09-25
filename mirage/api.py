@@ -5,13 +5,13 @@ from __future__ import annotations
 import io
 import json
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -231,7 +231,7 @@ def ledger_verify() -> dict:
 async def audit(
     file: UploadFile = File(...),
     n_trials: int = Form(...),
-    benchmark: Optional[str] = Form(None),
+    benchmark: str | None = Form(None),
     cost_bps: float = Form(5.0),
 ) -> dict:
     """Audit an external returns CSV + the declared number of trials tried."""

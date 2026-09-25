@@ -41,7 +41,7 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "UP", "B"]
-ignore = ["E501"]
+ignore = ["E501", "B008"]  # B008: typer/FastAPI option-in-default is idiomatic
 
 [tool.mypy]
 python_version = "3.11"

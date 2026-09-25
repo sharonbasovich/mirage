@@ -109,7 +109,7 @@ class Ledger:
                    VALUES (?,?,?,?,?,?,?,?,?,?)""",
                 (ts, program_id, label, cfg_json, ch, data_hash, met_json, returns_sha, prev, eh),
             )
-            eid = int(cur.lastrowid)
+            eid = int(cur.lastrowid or 0)
         return LedgerEntry(eid, ts, program_id, label, config, ch, data_hash,
                            metrics, returns_sha, prev, eh)
 

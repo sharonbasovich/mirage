@@ -10,7 +10,7 @@ from experiments.common import REPORTS, fig, save
 from mirage.data import load_close
 from mirage.program import analyze_trials, run_program
 
-PROGRAMS = [
+PROGRAMS: list[tuple[str, str, list[str], dict[str, list], float]] = [
     ("ma_cross_spy", "ma_cross", ["SPY"],
      {"fast": [5, 10, 20, 50], "slow": [50, 100, 150, 200], "long_only": [True]}, 5.0),
     ("tsmom_btc", "tsmom", ["BTC-USD"],
