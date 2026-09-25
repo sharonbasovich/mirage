@@ -1,16 +1,16 @@
 {
  "certificate": "mirage-pre-registration",
  "version": 1,
- "program_id": "ma_cross-SPY-8a2b1e2d",
- "issued_at": 1790314399.7732754,
+ "program_id": "ma_cross-SPY-bbb8d0e5",
+ "issued_at": 1790315014.205756,
  "trial_count": 15,
- "first_trial_ts": 1790311777.7536187,
- "last_trial_ts": 1790311777.844386,
- "chain_head": "722a940b1094fa9ceffe642e828a06ca307a386c9c98ef4d4e2b227d2902af99",
+ "first_trial_ts": 1790314706.3849394,
+ "last_trial_ts": 1790314706.513026,
+ "chain_head": "5d9ef72f310cc962c5f1d24885e01db84b4d43e6eba852ba09ce9e7bdf15a02d",
  "chain_valid": true,
  "chain_message": "chain intact",
  "best_trial": {
-  "entry_id": 187,
+  "entry_id": 383,
   "label": "ma_cross[7] {\"fast\": 10, \"long_only\": true, \"slow\": 200}",
   "config": {
    "cost_bps": 5.0,
