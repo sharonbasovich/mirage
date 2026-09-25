@@ -9,3 +9,4 @@ reports/*.json
 .mypy_cache/
 .ruff_cache/
 data/analyses/
+submission/video_segments/
