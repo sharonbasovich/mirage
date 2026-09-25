@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+data/ledger.sqlite3
+frontend/node_modules/
+frontend/dist/
+reports/*.json
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

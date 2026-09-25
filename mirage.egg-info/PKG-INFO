@@ -1,0 +1,20 @@
+Metadata-Version: 2.4
+Name: mirage
+Version: 0.1.0
+Summary: The backtest lie detector - overfitting diagnostics for trading strategies
+License: MIT
+Requires-Python: >=3.11
+Requires-Dist: numpy==2.2.6
+Requires-Dist: pandas==2.2.3
+Requires-Dist: scipy==1.15.3
+Requires-Dist: scikit-learn==1.6.1
+Requires-Dist: matplotlib==3.10.3
+Requires-Dist: fastapi==0.115.12
+Requires-Dist: uvicorn[standard]==0.34.2
+Requires-Dist: pydantic==2.11.4
+Requires-Dist: typer==0.15.3
+Requires-Dist: python-multipart==0.0.20
+Requires-Dist: yfinance==0.2.66
+Provides-Extra: dev
+Requires-Dist: pytest==8.3.5; extra == "dev"
+Requires-Dist: ruff==0.11.9; extra == "dev"
