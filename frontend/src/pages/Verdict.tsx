@@ -165,7 +165,9 @@ export default function Verdict() {
           <h2 className="font-bold mb-1">Cost fragility</h2>
           <p className="text-xs text-dim mb-3">
             Sharpe vs transaction cost · breakeven{" "}
-            {a.cost_curve.breakeven_bps.toFixed(0)} bps
+            {a.cost_curve.capped
+              ? `> ${a.cost_curve.breakeven_bps.toFixed(0)} bps (never crosses zero on the grid)`
+              : `${a.cost_curve.breakeven_bps.toFixed(0)} bps`}
           </p>
           <CostCurve
             costBps={a.cost_curve.cost_bps}

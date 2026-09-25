@@ -23,7 +23,7 @@ from mirage.diagnostics.verdict import build_verdict
 SKILL_LEVELS = [0.0, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0]
 
 
-def run(n_strategies: int = 50, n_days: int = 756, reps: int = 40,
+def run(n_strategies: int = 50, n_days: int = 2500, reps: int = 40,
         daily_vol: float = 0.01, seed: int = 11) -> dict:
     rng = np.random.default_rng(seed)
     rows: list[dict] = []

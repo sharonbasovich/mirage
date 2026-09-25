@@ -204,6 +204,7 @@ def analyze_trials(
             "cost_bps": frag.cost_grid_bps.tolist(),
             "sharpe": frag.sharpe_curve.tolist(),
             "breakeven_bps": frag.breakeven_bps,
+            "capped": frag.capped,
         },
         "verdict": {
             "score": verdict.score,

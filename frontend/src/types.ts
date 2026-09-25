@@ -63,7 +63,7 @@ export interface Analysis {
   n_combinations: number;
   reality_check_p: number | null;
   reality_check_best: number | null;
-  cost_curve: { cost_bps: number[]; sharpe: number[]; breakeven_bps: number };
+  cost_curve: { cost_bps: number[]; sharpe: number[]; breakeven_bps: number; capped: boolean };
   verdict: {
     score: number;
     label: string;
