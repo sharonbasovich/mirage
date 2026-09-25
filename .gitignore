@@ -3,7 +3,7 @@ __pycache__/
 *.pyc
 data/ledger.sqlite3
 frontend/node_modules/
-frontend/dist/
+# frontend/dist  # committed so the app runs without npm (single-origin deploy)/
 reports/*.json
 .pytest_cache/
 .mypy_cache/
