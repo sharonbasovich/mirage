@@ -35,3 +35,14 @@
 ## Working style notes
 - Local repo has full history; commit early and often.
 - Everything runs offline; `make experiments` re-derives all figures.
+
+## 2026-09-25 — QA round 2 (statistical correctness)
+- Fixed PSR/MinBTL per-period unit bug (Bailey & LdP formulas take per-period SR).
+- CSCV IS/OOS Sharpes now annualized; verdict degradation uses median CSCV IS-vs-OOS.
+- Reality Check added as a verdict component (0.20); rc_p>0.5 hard-caps label at Unclear.
+- Cost-fragility capped breakeven renders as ">300 bps (never crosses)".
+- E1: 0/20 zero-skill zoos Survives (16 Mirage/4 Unclear); DSR alone misses 45%.
+- E2 at T=2500: verdict Survives 53/82/98% at planted SR 1.0/1.5/2.0; label
+  confusion TP102/FP5/FN53/TN160 = 82% accuracy.
+- E3: only tsmom_btc Survives (95.0); rsi/ml capped to Unclear by RC gate.
+- Demo video re-rendered: 2:41 with Piper TTS narration (AAC) + burned subs.
