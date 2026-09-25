@@ -145,8 +145,9 @@ def analyze_trials(
     oos_median = float(np.median(cscv.oos_sharpes))
 
     if benchmark_returns is not None:
+        bench_al = benchmark_returns.reindex(rets.index).fillna(0.0)
         rc = reality_check(
-            rets.to_numpy(), benchmark_returns.to_numpy(),
+            rets.to_numpy(), bench_al.to_numpy(),
             n_bootstrap=n_bootstrap, seed=seed,
         )
         rc_p = rc.p_value
