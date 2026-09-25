@@ -10,3 +10,5 @@ reports/*.json
 .ruff_cache/
 data/analyses/
 submission/video_segments/
+mirage.egg-info/
+en_US-lessac-medium.onnx*

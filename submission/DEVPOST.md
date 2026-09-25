@@ -69,9 +69,10 @@ stationary bootstrap (Politis–Romano) around the benchmark-excess distribution
 
 - **DSR's independence assumption fails on real zoos.** In E1, every trial is
   the same random signal generator on the same SPY series, so trial Sharpes are
-  correlated — DSR alone misses 55% of zero-skill zoos at p=0.05. We turned
-  that failure into the central finding: no single test is reliable; the
-  combined battery misses only 5%.
+  correlated — DSR alone misses 45% of zero-skill zoos (DSR p > 0.5 = "claims
+  skill"). We turned that failure into the central finding: no single test is
+  reliable; the full verdict battery missed **0%** — all 20 zero-skill zoos
+  came out Mirage or Unclear, none Survives.
 - **PBO needs genuinely distinct trials.** On pure noise CSCV returns ~0.5 by
   construction, so our unit test had to plant a *localized* edge to show
   PBO→high vs a persistent edge → low.
@@ -84,10 +85,13 @@ stationary bootstrap (Politis–Romano) around the benchmark-excess distribution
 ## Accomplishments that we're proud of
 
 - The tool catches *itself*: E1 shows a 1,000-strategy random zoo produces a
-  "great" backtest (IS Sharpe 0.61) that Mirage correctly rejects
-  (DSR p=0.001, PBO=0.73).
-- Published detector error rates — E2 ROC AUC 0.81 (DSR) / 0.79 (PBO); a
-  metrology tool that reports its own measurement error.
+  "great" backtest (IS Sharpe 0.61, naive PSR 99.8%) that Mirage correctly
+  rejects (DSR p=0.36, PBO=0.73, RC p=1.00 → Mirage 24/100).
+- Published detector error rates — E2 ROC AUC 0.91 (DSR) / 0.90 (PBO); and
+  the *verdict label itself* is validated on ground truth: TP 102 / FP 5 /
+  FN 53 / TN 160 = 82% accuracy, 5% of pure-noise zoos labeled Survives,
+  82–98% detection for planted Sharpe ≥ 1.5. A metrology tool that reports
+  its own measurement error.
 - The Trial Ledger: a 60-line hash chain that makes trial-deletion evident —
   pre-registration for backtests as a real, working artifact.
 - One-command reproduction: `pip install -e . && make experiments` regenerates
@@ -121,8 +125,8 @@ confident number.
 
 python · numpy · pandas · scipy · scikit-learn · fastapi · uvicorn · typer ·
 sqlite · pytest · ruff · mypy · react · vite · typescript · tailwind-css ·
-recharts · matplotlib · yfinance · docker · github-actions · flyio ·
-**devin (cognition-ai)**
+recharts · matplotlib · yfinance · docker · github-actions ·
+devin-deploy-flyio · **devin (cognition-ai)**
 
 ## Data & citations
 

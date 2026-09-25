@@ -44,7 +44,7 @@ def record(pw, name: str, fn, shot: str | None = None) -> float:
 def scene_lab(page):
     page.goto(BASE, wait_until="networkidle")
     page.wait_for_selector("text=Strategy Zoo")
-    page.wait_for_timeout(1500)
+    page.wait_for_timeout(8000)
 
 
 def scene_run(page):

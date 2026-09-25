@@ -1,87 +1,94 @@
 {
-    "certificate": "mirage-pre-registration",
-    "version": 1,
-    "program_id": "ma_cross-SPY-8a2b1e2d",
-    "issued_at": 1790312002.0220385,
-    "trial_count": 15,
-    "first_trial_ts": 1790311777.7536187,
-    "last_trial_ts": 1790311777.844386,
-    "chain_head": "722a940b1094fa9ceffe642e828a06ca307a386c9c98ef4d4e2b227d2902af99",
-    "chain_valid": true,
-    "chain_message": "chain intact",
-    "best_trial": {
-        "entry_id": 187,
-        "label": "ma_cross[7] {\"fast\": 10, \"long_only\": true, \"slow\": 200}",
-        "config": {
-            "cost_bps": 5.0,
-            "family": "ma_cross",
-            "params": {
-                "fast": 10,
-                "long_only": true,
-                "slow": 200
-            },
-            "slippage_bps": 0.0,
-            "symbols": [
-                "SPY"
-            ],
-            "vol_target": null
-        },
-        "metrics": {
-            "ann_return": 0.09099318090795916,
-            "ann_vol": 0.11730919963067447,
-            "days": 5466,
-            "max_drawdown": -0.20338184339087417,
-            "n_trades": 39,
-            "sharpe": 0.8013945727512045,
-            "total_turnover": 39.0
-        }
-    },
-    "verdict": {
-        "score": 64.9,
-        "label": "Unclear",
-        "components": [
-            {
-                "key": "dsr",
-                "label": "Deflated Sharpe p-value",
-                "weight": 0.25,
-                "score": 100.0,
-                "detail": "DSR p-value = 1.00 across 15 trials"
-            },
-            {
-                "key": "pbo",
-                "label": "PBO (CSCV)",
-                "weight": 0.25,
-                "score": 35.4,
-                "detail": "PBO = 0.65: probability the IS winner is below median OOS"
-            },
-            {
-                "key": "degradation",
-                "label": "IS-vs-OOS retention",
-                "weight": 0.2,
-                "score": 5.0,
-                "detail": "median OOS Sharpe 0.04 vs IS 0.80"
-            },
-            {
-                "key": "cost_fragility",
-                "label": "Cost fragility",
-                "weight": 0.15,
-                "score": 100.0,
-                "detail": "Sharpe hits zero at 300 bps (assumed 5 bps)"
-            },
-            {
-                "key": "length",
-                "label": "Backtest length",
-                "weight": 0.15,
-                "score": 100.0,
-                "detail": "5466 days vs minimum 14 required"
-            }
-        ],
-        "narrative": [
-            "The Deflated Sharpe Ratio still assigns 100% probability to genuine skill after accounting for 15 trials.",
-            "In 65% of combinatorial splits the in-sample winner fell below the median out of sample - a classic overfitting signature.",
-            "The selected configuration kept only 5% of its in-sample Sharpe out of sample."
-        ]
-    },
-    "disclaimer": "Research prototype built for GIBC V2. Not a product, not a financial service, not financial advice.",
-    "data_hash": "6b0ca35178414ce08ad3f3a066104e4311d53157032bec999a098320fb88903b"
+ "certificate": "mirage-pre-registration",
+ "version": 1,
+ "program_id": "ma_cross-SPY-8a2b1e2d",
+ "issued_at": 1790314399.7732754,
+ "trial_count": 15,
+ "first_trial_ts": 1790311777.7536187,
+ "last_trial_ts": 1790311777.844386,
+ "chain_head": "722a940b1094fa9ceffe642e828a06ca307a386c9c98ef4d4e2b227d2902af99",
+ "chain_valid": true,
+ "chain_message": "chain intact",
+ "best_trial": {
+  "entry_id": 187,
+  "label": "ma_cross[7] {\"fast\": 10, \"long_only\": true, \"slow\": 200}",
+  "config": {
+   "cost_bps": 5.0,
+   "family": "ma_cross",
+   "params": {
+    "fast": 10,
+    "long_only": true,
+    "slow": 200
+   },
+   "slippage_bps": 0.0,
+   "symbols": [
+    "SPY"
+   ],
+   "vol_target": null
+  },
+  "metrics": {
+   "ann_return": 0.09099318090795916,
+   "ann_vol": 0.11730919963067447,
+   "days": 5466,
+   "max_drawdown": -0.20338184339087417,
+   "n_trades": 39,
+   "sharpe": 0.8013945727512045,
+   "total_turnover": 39.0
+  }
+ },
+ "verdict": {
+  "score": 60.3,
+  "label": "Unclear",
+  "components": [
+   {
+    "key": "dsr",
+    "label": "Deflated Sharpe p-value",
+    "weight": 0.2,
+    "score": 99.8,
+    "detail": "DSR p-value = 1.00 across 15 trials"
+   },
+   {
+    "key": "pbo",
+    "label": "PBO (CSCV)",
+    "weight": 0.25,
+    "score": 35.4,
+    "detail": "PBO = 0.65: probability the IS winner is below median OOS"
+   },
+   {
+    "key": "rc",
+    "label": "Reality Check",
+    "weight": 0.2,
+    "score": 3.0,
+    "detail": "White RC p = 0.97: does the best trial beat the benchmark beyond luck?"
+   },
+   {
+    "key": "degradation",
+    "label": "IS-vs-OOS retention",
+    "weight": 0.15,
+    "score": 72.9,
+    "detail": "median OOS Sharpe 0.64 vs median IS 0.88 across CSCV splits"
+   },
+   {
+    "key": "cost_fragility",
+    "label": "Cost fragility",
+    "weight": 0.1,
+    "score": 100.0,
+    "detail": "> 300 bps (never crosses zero on the grid)"
+   },
+   {
+    "key": "length",
+    "label": "Backtest length",
+    "weight": 0.1,
+    "score": 100.0,
+    "detail": "5466 days vs minimum 1114 required"
+   }
+  ],
+  "narrative": [
+   "The Deflated Sharpe Ratio still assigns 100% probability to genuine skill after accounting for 15 trials.",
+   "In 65% of combinatorial splits the in-sample winner fell below the median out of sample - a classic overfitting signature.",
+   "The best trial does not beat the benchmark beyond luck (Reality Check p = 0.97)."
+  ]
+ },
+ "disclaimer": "Research prototype built for GIBC V2. Not a product, not a financial service, not financial advice.",
+ "data_hash": "6b0ca35178414ce08ad3f3a066104e4311d53157032bec999a098320fb88903b"
 }

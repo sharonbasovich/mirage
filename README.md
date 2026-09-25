@@ -38,7 +38,7 @@ and detection power, and publish ROC curves.
 Prerequisites: Python ≥ 3.11, Node ≥ 20 (only for the web UI), ~2 GB disk.
 
 ```bash
-git clone <this repo> && cd mirage
+git clone https://github.com/sharonbasovich/mirage.git && cd mirage
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"          # core lib, CLI, API, dev tools
 pytest                            # 29 unit tests
@@ -94,26 +94,40 @@ Backtester convention: signal at close *t* → position from *t+1*
 ## Validation results (rerun: `make experiments`)
 
 **E1 — false positives.** 1,000 random zero-skill signal strategies on real
-SPY returns. Best in-sample Sharpe = **0.61** — looks fine! DSR threshold
-(expected max Sharpe under luck) = **0.69** → correctly rejected
-(DSR p = 0.001), and CSCV PBO = **0.73**. Over 20 independent 100-strategy
-zoos: DSR alone fails to flag **55%** of zoos (correlated trials share SPY's
-drift — a real, honest finding), while **the combined battery misses only
-5%**. This is exactly why the verdict uses multiple independent diagnostics.
+SPY returns. Best in-sample Sharpe = **0.61** — looks fine, and naive PSR
+certifies it at 99.8%! But the DSR threshold (expected max Sharpe under
+luck) = **0.69** → DSR p = **0.36**, CSCV PBO = **0.73**, Reality Check
+p = **1.00** → verdict **Mirage (24/100)**. Over 20 independent 100-strategy
+zoos: DSR alone fails to flag **45%** of zoos (correlated trials share SPY's
+drift — a real, honest finding), PBO alone misses **5%**, and **the full
+verdict battery misses 0%** — every zero-skill zoo is labeled Mirage or
+Unclear, none Survives. This is exactly why the verdict uses multiple
+independent diagnostics.
 
-**E2 — detection power.** Synthetic markets with planted, tunable true skill
-(8 levels × 40 reps × 50 strategies): power rises monotonically with skill
-(≈0 at Sharpe 0 → ≈0.9+ above Sharpe 1). ROC AUC: **DSR 0.81, PBO 0.79**.
+**E2 — detection power + label validation.** Synthetic markets with planted,
+tunable true skill (8 levels × 40 reps × 50 strategies, T = 2500): among reps
+where the skilled strategy wins IS, the verdict says **Survives in
+53%/82%/98%** at planted Sharpe 1.0/1.5/2.0 — Sharpe 1.0 is the honest
+detection boundary (on the misses the realized Sharpe landed ~0.65–0.98).
+ROC AUC: **DSR 0.91, PBO 0.90**. The verdict *label itself* is validated on
+ground truth: treating Survives as the classifier, confusion matrix
+TP 102 / FP 5 / FN 53 / TN 160 → **82% accuracy**; only **5%** of pure-noise
+zoos are ever labeled Survives.
 
 **E3 — real strategy report cards** (`reports/e3.json`):
 
-| Program | Trials | Best IS Sharpe | PBO | Score | Verdict |
-|---|---|---|---|---|---|
-| MA crossover grid, SPY | 15 | 0.80 | 0.65 | 64.9 | Unclear |
-| TS-momentum grid, BTC | 12 | — | 0.09 | 78.8 | Survives |
-| 12-1 sector momentum | 12 | — | 0.66 | 64.5 | Unclear |
-| RSI mean-reversion, SPY | 36 | — | 0.29 | 73.6 | Survives |
-| ML classifier grid, SPY | 8 | — | 0.07 | 79.4 | Survives |
+| Program | Trials | Best IS Sharpe | DSR p | PBO | RC p | MinBTL | Score | Verdict |
+|---|---|---|---|---|---|---|---|---|
+| MA crossover grid, SPY | 15 | 0.80 | 0.998 | 0.65 | 0.97 | 1,114 | 60.3 | Unclear |
+| TS-momentum grid, BTC | 12 | 1.09 | 0.999 | 0.09 | 0.03 | 548 | 95.0 | Survives |
+| 12-1 sector momentum | 12 | 0.55 | 0.987 | 0.66 | 0.99 | 2,289 | 59.4 | Unclear |
+| RSI mean-reversion, SPY | 36 | 0.66 | 0.947 | 0.29 | 0.99 | 1,529 | 66.1 | Unclear |
+| ML classifier grid, SPY | 8 | 0.69 | 0.995 | 0.07 | 0.82 | 1,455 | 81.2 | Unclear |
+
+Only the BTC momentum zoo survives: its best trial beats the BTC buy-and-hold
+benchmark beyond luck (RC p = 0.03) and stays above the OOS median in 91% of
+splits. The others post respectable in-sample Sharpes but fail the Reality
+Check — which hard-caps the label at Unclear even when the score clears 65.
 
 ## How to reproduce every figure
 
@@ -172,7 +186,7 @@ Statistical methods follow the cited academic sources.
 Python · numpy · pandas · scipy · scikit-learn · FastAPI · uvicorn · typer ·
 SQLite · pytest · ruff · mypy · React 18 · Vite · TypeScript · Tailwind CSS ·
 Recharts · matplotlib · yfinance (Yahoo Finance data) · Docker ·
-GitHub Actions · Fly.io · **Devin (Cognition AI)**
+GitHub Actions · Devin deploy (Fly.io infra) · **Devin (Cognition AI)**
 
 ## License
 
