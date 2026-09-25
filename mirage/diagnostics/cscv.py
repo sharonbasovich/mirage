@@ -64,7 +64,8 @@ def _sub_sharpe(sums: np.ndarray, ssq: np.ndarray, cnt: np.ndarray, blocks: np.n
     return mean / np.sqrt(var)
 
 
-def cscv_pbo(returns: np.ndarray, n_blocks: int = 16) -> CSCVResult:
+def cscv_pbo(returns: np.ndarray, n_blocks: int = 16,
+             periods_per_year: int = 252) -> CSCVResult:
     """Compute PBO and companion statistics.
 
     Parameters
@@ -73,6 +74,9 @@ def cscv_pbo(returns: np.ndarray, n_blocks: int = 16) -> CSCVResult:
         Daily returns of N candidate configurations (aligned, no NaNs).
     n_blocks : int
         Number of contiguous blocks S (must be even; paper uses 16).
+    periods_per_year : int
+        Annualization factor for the reported is_sharpes / oos_sharpes
+        (ranks and lambdas are scale-invariant; only reporting changes).
     """
     m = np.asarray(returns, dtype=float)
     if m.ndim != 2:
@@ -109,8 +113,9 @@ def cscv_pbo(returns: np.ndarray, n_blocks: int = 16) -> CSCVResult:
         oos_sr.append(float(oos_perf[n_star]))
 
     lambdas_arr = np.asarray(lambdas)
-    is_arr = np.asarray(is_sr)
-    oos_arr = np.asarray(oos_sr)
+    ann = np.sqrt(periods_per_year)
+    is_arr = np.asarray(is_sr) * ann
+    oos_arr = np.asarray(oos_sr) * ann
 
     pbo = float(np.mean(lambdas_arr < 0))
     p_loss = float(np.mean(oos_arr < 0))

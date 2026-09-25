@@ -142,6 +142,7 @@ def analyze_trials(
     haircuts = haircut_adjusted_pvalues(pvals)
 
     cscv = cscv_pbo(rets.to_numpy(), n_blocks=n_blocks)
+    is_median = float(np.median(cscv.is_sharpes))
     oos_median = float(np.median(cscv.oos_sharpes))
 
     if benchmark_returns is not None:
@@ -163,13 +164,15 @@ def analyze_trials(
     verdict = build_verdict(
         dsr_p=dsr_p,
         pbo=cscv.pbo,
-        is_sharpe=best_is_sharpe,
+        is_sharpe=is_median,
         oos_sharpe_median=oos_median,
         breakeven_bps=frag.breakeven_bps,
         assumed_cost_bps=assumed_cost_bps,
         n_days=n_days,
         min_btl=min_btl,
         n_trials=len(trials),
+        rc_p=rc_p,
+        breakeven_capped=frag.capped,
     )
 
     eq = (1.0 + rets).cumprod()

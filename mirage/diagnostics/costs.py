@@ -15,6 +15,7 @@ class CostFragility:
     sharpe_curve: np.ndarray
     breakeven_bps: float  # cost at which Sharpe crosses 0 (capped at grid max)
     assumed_cost_bps: float
+    capped: bool = False  # True when the curve never crosses zero on the grid
 
 
 def cost_fragility(
@@ -53,4 +54,5 @@ def cost_fragility(
         sharpe_curve=curve,
         breakeven_bps=breakeven,
         assumed_cost_bps=assumed_cost_bps,
+        capped=len(below) == 0,
     )

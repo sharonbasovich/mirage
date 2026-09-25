@@ -47,14 +47,19 @@ def psr(
     """Probabilistic Sharpe Ratio: P(true SR > sr_benchmark).
 
     Returns a probability in [0, 1]. ``returns`` are per-period returns and
-    ``sr_benchmark`` is an annualized Sharpe threshold.
+    ``sr_benchmark`` is an annualized Sharpe threshold.  The test statistic is
+    in per-period units (Bailey & Lopez de Prado 2012), so both Sharpes are
+    de-annualized before entering it.
     """
     sr = sharpe_ratio(returns, periods_per_year)
     skew, kurt, t = _moments(returns)
     if t < 2:
         return 0.0
-    denom = np.sqrt(max(1e-12, 1 - skew * sr + (kurt - 1) / 4 * sr**2))
-    z = (sr - sr_benchmark) * np.sqrt(t - 1) / denom
+    ann = np.sqrt(periods_per_year)
+    sr_p = sr / ann
+    sr_b = sr_benchmark / ann
+    denom = np.sqrt(max(1e-12, 1 - skew * sr_p + (kurt - 1) / 4 * sr_p**2))
+    z = (sr_p - sr_b) * np.sqrt(t - 1) / denom
     return float(stats.norm.cdf(z))
 
 
@@ -105,8 +110,10 @@ def min_backtest_length(
     sr = sharpe_ratio(returns, periods_per_year)
     skew, kurt, _ = _moments(returns)
     z = float(stats.norm.ppf(confidence))
-    diff = sr - sr_benchmark
+    ann = np.sqrt(periods_per_year)
+    sr_p = sr / ann
+    diff = (sr - sr_benchmark) / ann
     if diff <= 0:
         return float("inf")
-    factor = 1 - skew * sr + (kurt - 1) / 4 * sr**2
+    factor = 1 - skew * sr_p + (kurt - 1) / 4 * sr_p**2
     return float(1 + max(0.0, factor) * (z / diff) ** 2)

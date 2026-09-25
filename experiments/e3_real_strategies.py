@@ -46,6 +46,8 @@ def run() -> dict:
             "dsr": res["dsr"],
             "pbo": res["pbo"],
             "reality_check_p": res["reality_check_p"],
+            "cscv_is_median": float(np.median(res["cscv_is_sharpes"])),
+            "cscv_oos_median": float(np.median(res["cscv_oos_sharpes"])),
             "breakeven_bps": res["cost_curve"]["breakeven_bps"],
             "min_btl": res["min_btl"],
             "score": v["score"],

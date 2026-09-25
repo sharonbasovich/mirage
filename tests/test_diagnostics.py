@@ -45,6 +45,16 @@ def test_psr_bounds_and_monotonicity():
     assert p_pos > 0.9 > p_neg
 
 
+def test_psr_uses_per_period_units():
+    # Bailey & LdP 2012: statistic is in per-period SR units.  One year of iid
+    # normal returns with annualized Sharpe ~0.5 must NOT saturate to ~1.0
+    # (the annualized-units bug gave ~1.0 for everything).
+    r = iid(252, mu=0.5 * 0.01 / np.sqrt(252), sd=0.01)
+    p = psr(r)
+    assert 0.05 < p < 0.95
+    assert 0.5 < p < 0.85  # near Phi(0.5 * sqrt(251/252)) ~ 0.69
+
+
 def test_psr_benchmark():
     r = iid(2000, mu=0.0005, sd=0.01)
     # higher benchmark -> lower PSR
@@ -72,6 +82,15 @@ def test_min_btl_reasonable_for_strong_edge():
     r = iid(5000, mu=0.002, sd=0.01)
     m = min_backtest_length(r)
     assert np.isfinite(m) and m < 5000
+
+
+def test_min_btl_per_period_units():
+    # MinTRL is in observations on per-period SR:  SR_ann=1.0 iid normal needs
+    # ~ (1.645 * sqrt(252))**2 ~ 681 observations (+/-20%).
+    r = iid(5000, mu=1.0 * 0.01 / np.sqrt(252), sd=0.01)
+    m = min_backtest_length(r)
+    assert np.isfinite(m)
+    assert 680 * 0.8 < m < 680 * 1.2
 
 
 # --- CSCV / PBO -----------------------------------------------------------
@@ -200,11 +219,29 @@ def test_haircuts_many_nulls():
 def test_verdict_labels():
     v_bad = build_verdict(dsr_p=0.01, pbo=0.9, is_sharpe=2.0, oos_sharpe_median=-0.2,
                           breakeven_bps=2, assumed_cost_bps=5, n_days=500,
-                          min_btl=5000, n_trials=200)
+                          min_btl=5000, n_trials=200, rc_p=0.97)
     assert v_bad.label == "Mirage" and v_bad.score < 40
     v_good = build_verdict(dsr_p=0.99, pbo=0.1, is_sharpe=1.0, oos_sharpe_median=1.0,
                            breakeven_bps=300, assumed_cost_bps=5, n_days=5000,
-                           min_btl=100, n_trials=10)
+                           min_btl=100, n_trials=10, rc_p=0.02)
     assert v_good.label == "Survives" and v_good.score > 65
-    assert len(v_bad.components) == 5
+    assert len(v_bad.components) == 6
     assert sum(c.weight for c in v_bad.components) == pytest.approx(1.0)
+
+
+def test_verdict_without_benchmark_renormalizes():
+    v = build_verdict(dsr_p=0.99, pbo=0.1, is_sharpe=1.0, oos_sharpe_median=1.0,
+                      breakeven_bps=300, assumed_cost_bps=5, n_days=5000,
+                      min_btl=100, n_trials=10, rc_p=None)
+    assert not any(c.key == "rc" for c in v.components)
+    # score is a weighted mean over the present components
+    w = sum(c.weight for c in v.components)
+    assert w == pytest.approx(0.8)
+    assert any("renormalized" in n for n in v.narrative)
+
+
+def test_verdict_rc_failure_flagged():
+    v = build_verdict(dsr_p=0.95, pbo=0.3, is_sharpe=1.0, oos_sharpe_median=0.8,
+                      breakeven_bps=150, assumed_cost_bps=5, n_days=5000,
+                      min_btl=100, n_trials=10, rc_p=0.97)
+    assert any("Reality Check" in n for n in v.narrative)
