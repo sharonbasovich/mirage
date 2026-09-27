@@ -5,6 +5,8 @@ data/ledger.sqlite3
 frontend/node_modules/
 # frontend/dist  # committed so the app runs without npm (single-origin deploy)/
 reports/*.json
+!reports/e2.json
+!reports/e4.json
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/

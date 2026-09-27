@@ -1,0 +1,61 @@
+{
+  "source": "World Bank Commodity Price Data (The Pink Sheet), CC BY 4.0",
+  "cards": [
+    {
+      "program": "wb_gold_ma",
+      "program_id": "ma_cross-WB_GOLD-f0468f0c",
+      "n_trials": 12,
+      "n_months": 668,
+      "best_sharpe": 0.712314583057895,
+      "psr": 0.9999999997868939,
+      "dsr": 0.9999999934013813,
+      "pbo": 0.2320901320901321,
+      "reality_check_p": 0.59,
+      "min_btl_months": 47.28484971959094,
+      "score": 81.2,
+      "label": "Unclear"
+    },
+    {
+      "program": "wb_brent_tsmom",
+      "program_id": "tsmom-WB_BRENT-f84ab456",
+      "n_trials": 10,
+      "n_months": 668,
+      "best_sharpe": 0.6231865144175007,
+      "psr": 0.9999999896418212,
+      "dsr": 0.9996387628276848,
+      "pbo": 0.013908313908313909,
+      "reality_check_p": 0.518,
+      "min_btl_months": 58.423294122100295,
+      "score": 87.4,
+      "label": "Unclear"
+    },
+    {
+      "program": "wb_commodity_mom",
+      "program_id": "sector_mom-WB_GOLD-5f74af00",
+      "n_trials": 12,
+      "n_months": 668,
+      "best_sharpe": 0.3394983490515433,
+      "psr": 0.9972408399484267,
+      "dsr": 0.9674833505390061,
+      "pbo": 0.2742812742812743,
+      "reality_check_p": 0.994,
+      "min_btl_months": 235.32587100731394,
+      "score": 68.7,
+      "label": "Unclear"
+    },
+    {
+      "program": "wb_gold_rsi",
+      "program_id": "rsi_rev-WB_GOLD-b0522c1d",
+      "n_trials": 27,
+      "n_months": 668,
+      "best_sharpe": 0.22556724587583318,
+      "psr": 0.9601297790052037,
+      "dsr": 0.4671780245569512,
+      "pbo": 0.30007770007770007,
+      "reality_check_p": 1.0,
+      "min_btl_months": 588.7815262354596,
+      "score": 51.8,
+      "label": "Unclear"
+    }
+  ]
+}
