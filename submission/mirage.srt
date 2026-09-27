@@ -7,37 +7,37 @@ Anyone can build a trading strategy with a three-hundred-percent backtest. Almos
 We ran one thousand random, zero-skill strategies on real S&P data. The best backtest looks great — a Sharpe of 0.61. It's pure luck, and the math knows it.
 
 3
-00:00:40,000 --> 00:00:48,867
-Mirage backtests your strategy grid on real market data with realistic costs — and remembers every single trial.
+00:00:40,000 --> 00:00:48,634
+Mirage backtests your strategy grid on historical data with realistic costs, and remembers every single trial.
 
 4
-00:00:48,867 --> 00:01:01,134
-Every trial lands in a tamper-evident Trial Ledger: pre-registration for backtests. You can't quietly delete the losers. Then the overfitting battery runs: Deflated Sharpe Ratio, CSCV, Reality Check.
+00:00:48,634 --> 00:00:55,468
+Every trial lands in a hash-chained Trial Ledger, so the trial count can't quietly shrink inside the ledger. Then the overfitting battery runs: Deflated Sharpe Ratio, CSCV, Reality Check.
 
 5
-00:01:01,134 --> 00:01:17,201
-The verdict card: PBO — the probability the in-sample winner underperforms out of sample — is sixty-five percent. Flagged unclear, leaning overfit. Don't trust it.
+00:00:55,468 --> 00:01:09,168
+This zoo runs on bundled, openly licensed World Bank gold prices. The overfitting risk is low, twenty-three percent, but the best trial does not beat simply holding gold beyond luck. Reality Check p is point five nine, so the verdict is capped at unclear.
 
 6
-00:01:17,201 --> 00:01:24,468
-Every trial is hash-chained — timestamp, config hash, data hash. Export a pre-registration certificate any third party can verify.
+00:01:09,168 --> 00:01:17,002
+Every trial is hash-chained — timestamp, config hash, data hash. Export a certificate with the chain head, and publish it to anchor the record.
 
 7
-00:01:24,468 --> 00:01:36,302
+00:01:17,002 --> 00:01:25,636
 Already used another backtester? Upload your returns and a trial count — Mirage audits the field, not just its own runs.
 
 8
-00:01:36,302 --> 00:01:47,402
+00:01:25,636 --> 00:01:36,803
 Every method is from the published literature — Deflated Sharpe Ratio, CSCV, White's Reality Check, purged cross-validation — with formulas and citations on the methods page.
 
 9
-00:01:47,402 --> 00:02:09,402
+00:01:36,803 --> 00:01:58,803
 And Mirage validates itself — planted-skill experiments measure the detector's own ROC AUC at point nine, and the verdict label's own accuracy on ground truth.
 
 10
-00:02:09,402 --> 00:02:29,402
+00:01:58,803 --> 00:02:18,803
 DSR alone misses forty-five percent of zero-skill zoos — the combined battery misses none. The verdict is a battery, not a number.
 
 11
-00:02:29,402 --> 00:02:41,402
+00:02:18,803 --> 00:02:30,803
 Mirage — free, open source, MIT licensed. Stop trusting your own backtests.

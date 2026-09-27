@@ -1,0 +1,9 @@
+.venv/
+**/node_modules/
+**/__pycache__/
+.git/
+data/ledger.sqlite3
+data/analyses/
+submission/
+reports/*.json
+*.onnx*

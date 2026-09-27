@@ -9,7 +9,7 @@ export default function Lab() {
   const [strategies, setStrategies] = useState<StrategyInfo[]>([]);
   const [demos, setDemos] = useState<DemoInfo[]>([]);
   const [family, setFamily] = useState("ma_cross");
-  const [picked, setPicked] = useState<string[]>(["SPY"]);
+  const [picked, setPicked] = useState<string[]>([]);
   const [gridText, setGridText] = useState("");
   const [cost, setCost] = useState(5);
   const [busy, setBusy] = useState<string | null>(null);
@@ -75,8 +75,10 @@ export default function Lab() {
           <h1 className="text-xl font-bold mb-1">Strategy Lab</h1>
           <p className="text-sm text-dim mb-5">
             Pick a strategy family, a universe, and a parameter grid. Every trial
-            is logged to the tamper-evident Trial Ledger — Mirage counts them all
-            when judging your "best" result.
+            is appended to the hash-chained Trial Ledger, and Mirage counts every
+            one when judging your "best" result. Bundled data: World Bank Pink
+            Sheet monthly commodity prices (CC BY 4.0). Daily Yahoo symbols
+            appear only if you fetched them locally.
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -100,7 +102,7 @@ export default function Lab() {
             </div>
           </div>
           <div className="mt-4">
-            <label className="label">Universe (cached data)</label>
+            <label className="label">Universe (one frequency per program)</label>
             <div className="flex flex-wrap gap-2">
               {symbols.map((s) => (
                 <button
@@ -111,7 +113,7 @@ export default function Lab() {
                       ? "border-accent text-accent bg-accent/10"
                       : "border-edge text-dim hover:text-gray-300"
                   }`}
-                  title={`${s.rows} rows ${s.start}→${s.end}`}
+                  title={`${s.rows} ${s.frequency} rows ${s.start}→${s.end} · ${s.source} · ${s.license}`}
                 >
                   {s.symbol}
                 </button>

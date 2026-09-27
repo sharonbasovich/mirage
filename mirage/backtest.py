@@ -35,6 +35,7 @@ def run_backtest(
     slippage_bps: float = 0.0,
     vol_target: float | None = None,
     vol_window: int = 20,
+    periods_per_year: int = TRADING_DAYS,
 ) -> BacktestResult:
     """Backtest a target-position schedule.
 
@@ -63,7 +64,7 @@ def run_backtest(
     pos_exec = pos.shift(1).fillna(0.0)
 
     if vol_target is not None:
-        realized = rets.std(axis=1) * np.sqrt(TRADING_DAYS)
+        realized = rets.std(axis=1) * np.sqrt(periods_per_year)
         realized = realized.replace(0.0, np.nan).shift(1)
         scale = (vol_target / realized).clip(upper=3.0).fillna(0.0)
         pos_exec = pos_exec.mul(scale, axis=0)

@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 import typer
 
-from mirage.data import SYMBOLS, data_hash
 from mirage.ledger import Ledger
 from mirage.program import analyze_returns_matrix, analyze_trials, run_program
 from mirage.strategies import STRATEGIES
@@ -43,13 +42,13 @@ def _parse_grid(grid: str | None) -> dict | None:
 @app.command()
 def run(
     family: str = typer.Argument(..., help=f"strategy family: {sorted(STRATEGIES)}"),
-    symbols: str = typer.Option("SPY", help="comma-separated symbols"),
+    symbols: str = typer.Option("WB_GOLD", help="comma-separated symbols (WB_* bundled; Yahoo after fetch)"),
     grid: str | None = typer.Option(None, help="e.g. 'fast=5,10;slow=100,200'"),
     cost_bps: float = typer.Option(5.0),
     program: str | None = typer.Option(None, help="existing program id to append to"),
     analyze: bool = typer.Option(True, help="run diagnostics after trials"),
 ):
-    """Run a parameter grid; every trial lands in the tamper-evident ledger."""
+    """Run a parameter grid; every trial is appended to the hash-chained ledger."""
     syms = [s.strip() for s in symbols.split(",")]
     pid, trials = run_program(
         family, syms, grid=_parse_grid(grid), cost_bps=cost_bps,
@@ -111,14 +110,14 @@ def report(
     program: str = typer.Argument(..., help="program id"),
     out: Path | None = typer.Option(None, help="write certificate JSON here"),
 ):
-    """Print the pre-registration certificate for a recorded program."""
+    """Print the (unsigned) trial-ledger certificate for a recorded program."""
     led = Ledger()
     entries = led.entries(program)
     if not entries:
         typer.echo(f"no entries for program {program}", err=True)
         raise typer.Exit(1)
     cert = led.export_certificate(program)
-    cert["data_hash"] = data_hash(SYMBOLS)
+    cert["data_hash"] = entries[-1].data_hash
     text = json.dumps(cert, indent=2, default=str)
     if out:
         out.write_text(text)
@@ -136,7 +135,7 @@ def programs():
 
 @app.command()
 def experiments(
-    only: str | None = typer.Option(None, help="e1|e2|e3"),
+    only: str | None = typer.Option(None, help="e1|e2|e3|e4"),
 ):
     """Run the self-validation experiments (writes reports/)."""
     from experiments.run_all import main as run_all

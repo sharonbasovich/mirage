@@ -29,6 +29,9 @@ class Strategy:
     default_grid: dict[str, list[Any]]
     default_symbols: list[str]
     long_only_default: bool = True
+    # grid/symbols for the bundled monthly World Bank data; None = daily-only
+    monthly_grid: dict[str, list[Any]] | None = None
+    monthly_symbols: list[str] | None = None
 
 
 STRATEGIES: dict[str, Strategy] = {}

@@ -7,7 +7,7 @@
 **Tagline (≤60 chars):** The backtest lie detector.
 
 **Elevator pitch:** Anyone can build a trading strategy with a 300% backtest.
-Almost none survive live. Mirage records every trial in a tamper-evident ledger
+Almost none survive live. Mirage records every trial in a hash-chained ledger
 and runs the academic overfitting-diagnostics battery — DSR, PBO, purged CV,
 Reality Check — to tell you, in plain English, whether your backtest is real.
 
@@ -21,22 +21,25 @@ trials solved exactly this problem with pre-registration and multiple-testing
 corrections; quantitative finance has the same math (Bailey & López de Prado;
 White's Reality Check; Harvey–Liu haircuts) but almost no tooling a student or
 retail quant can actually use. We built Mirage to make "did my strategy
-overfit?" a one-click question — and to make cherry-picking trials
-cryptographically inconvenient.
+overfit?" a one-click question, and to make quietly dropping trials visible
+in the record.
 
 ## What it does
 
-- **Backtester:** vectorized daily engine with strict no-lookahead
-  (signal at close *t* → position from *t+1*), costs + slippage in bps, optional
+- **Backtester:** vectorized engine for daily or monthly bars with strict
+  no-lookahead (signal at close of bar *t* → position from bar *t+1*), costs + slippage in bps, optional
   volatility targeting. Strategy library: MA crossover, time-series momentum,
   12-1 cross-sectional sector momentum, RSI and Bollinger mean reversion,
   buy-and-hold, and a gradient-boosted ML classifier trained with purged
   walk-forward CV + embargo.
 - **Trial Ledger:** every trial — UI, CLI, or API — appends to a SQLite
-  hash-chained ledger (each entry's hash includes the previous entry's). It is
-  pre-registration for backtests: you can't quietly delete the losers.
-  Exports a signed "Backtest Pre-registration Certificate" JSON per research
-  program.
+  hash-chained ledger (each entry's hash includes the previous entry's), and
+  the Deflated Sharpe Ratio uses that recorded count. The chain detects edits
+  or deletions made inside an intact ledger. It is not signed or externally
+  anchored, so someone who rewrites the whole database can't be caught from
+  the file alone. Mirage exports an unsigned certificate JSON (trial count,
+  best trial, chain head, verdict) per program. Publishing the chain head
+  externally anchors it.
 - **Diagnostics battery:** Deflated Sharpe Ratio (Bailey & López de Prado
   2014), Probability of Backtest Overfitting via CSCV (Bailey, Borwein, López
   de Prado & Zhu 2017), purged CV, stationary-bootstrap Reality Check (White
@@ -92,10 +95,14 @@ stationary bootstrap (Politis–Romano) around the benchmark-excess distribution
   FN 53 / TN 160 = 82% accuracy, 5% of pure-noise zoos labeled Survives,
   82–98% detection for planted Sharpe ≥ 1.5. A metrology tool that reports
   its own measurement error.
-- The Trial Ledger: a 60-line hash chain that makes trial-deletion evident —
-  pre-registration for backtests as a real, working artifact.
-- One-command reproduction: `pip install -e . && make experiments` regenerates
-  every figure and statistic in this writeup, fully offline.
+- The Trial Ledger: a 60-line hash chain that exposes edits or deletions
+  inside an intact ledger. Anchoring it externally is on the roadmap.
+- Seeded reproduction: `make experiments` regenerates every figure. E2
+  (synthetic) and E4 (bundled World Bank data, CC BY 4.0) run fully offline.
+  E1/E3 use daily Yahoo data that each user fetches locally.
+- A public API built for abuse: bounded grids and uploads, a concurrency cap,
+  server-generated program IDs, same-origin CORS, and regression tests for
+  each.
 
 ## What we learned
 
@@ -107,8 +114,10 @@ confident number.
 
 ## What's next for Mirage
 
-- Signed certificates (asymmetric) so a third party can verify a program's
-  history without trusting our server.
+- Signed certificates plus an external anchor for the chain head (for
+  example a transparency log or a git commit), so a third party can check a
+  program's history without trusting the server. Today's certificates are
+  unsigned.
 - Ledger-to-verdict webhooks: pre-register a grid on GitHub and Mirage refuses
   trials outside the registered space.
 - More diagnostics: SPA test (Hansen 2005), stepwise RC, full Bayesian PBO
@@ -117,7 +126,7 @@ confident number.
 
 ## Try it out
 
-- **Live app:** [DEPLOYED URL — paste here]
+- **Live app:** [DEPLOYED URL — pending deploy approval and smoke test]
 - **Source:** https://github.com/sharonbasovich/mirage
 - **Demo video:** [YOUTUBE URL — human uploads; script in submission/VIDEO_SCRIPT.md]
 
@@ -125,13 +134,20 @@ confident number.
 
 python · numpy · pandas · scipy · scikit-learn · fastapi · uvicorn · typer ·
 sqlite · pytest · ruff · mypy · react · vite · typescript · tailwind-css ·
-recharts · matplotlib · yfinance · docker · github-actions ·
-devin-deploy-flyio · **devin (cognition-ai)**
+recharts · matplotlib · world-bank-pink-sheet · yfinance · docker ·
+github-actions · devin-deploy · **devin (cognition-ai)**
 
 ## Data & citations
 
-- Market data: Yahoo Finance via `yfinance` (research/educational use; see
-  provider terms). Daily OHLCV CSVs committed under `data/` — runs offline.
+- Bundled data: World Bank Commodity Price Data (The Pink Sheet), monthly
+  prices for 15 commodities, 1971–2026, licensed **CC BY 4.0**
+  (https://datacatalog.worldbank.org/search/dataset/0038238). Attribution:
+  "World Bank Commodity Price Data (The Pink Sheet), World Bank." The public
+  demo and tests use only this data plus synthetic series.
+- Optional daily data: Yahoo Finance via `yfinance`, which each user
+  downloads into a local cache with `scripts/fetch_data.py`, under Yahoo's
+  terms of service. It is **not** redistributed in the repo or the
+  deployment. E1/E3 and the demo video use such a local fetch.
 - Bailey & López de Prado (2012) *The Sharpe Ratio Efficient Frontier*;
   (2014) *The Deflated Sharpe Ratio*; Bailey, Borwein, López de Prado & Zhu
   (2017) *The Probability of Backtest Overfitting*; López de Prado (2018)

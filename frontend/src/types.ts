@@ -3,6 +3,9 @@ export interface SymbolInfo {
   rows: number;
   start: string;
   end: string;
+  frequency: "daily" | "monthly";
+  source: string;
+  license: string;
 }
 
 export interface StrategyInfo {
@@ -42,6 +45,8 @@ export interface VerdictComponent {
 export interface Analysis {
   n_trials: number;
   n_days: number;
+  periods_per_year?: number;
+  frequency?: "daily" | "monthly";
   best_index: number;
   best_label: string;
   best_config: Record<string, unknown>;

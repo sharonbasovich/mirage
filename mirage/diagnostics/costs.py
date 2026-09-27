@@ -24,6 +24,7 @@ def cost_fragility(
     assumed_cost_bps: float = 5.0,
     max_cost_bps: float = 300.0,
     n_points: int = 61,
+    periods_per_year: int = TRADING_DAYS,
 ) -> CostFragility:
     """Sharpe as a function of per-unit-turnover cost in basis points.
 
@@ -35,7 +36,7 @@ def cost_fragility(
     grid = np.linspace(0.0, max_cost_bps, n_points)
     curve = np.empty_like(grid)
     for i, c in enumerate(grid):
-        curve[i] = sharpe_ratio(g - c * u / 1e4, TRADING_DAYS)
+        curve[i] = sharpe_ratio(g - c * u / 1e4, periods_per_year)
 
     below = np.where(curve <= 0)[0]
     if len(below) == 0:

@@ -101,6 +101,8 @@ def _register_all() -> None:
                 "long_only": [True],
             },
             default_symbols=["SPY"],
+            monthly_grid={"fast": [2, 3, 6], "slow": [9, 12, 18, 24], "long_only": [True]},
+            monthly_symbols=["WB_GOLD"],
         )
     )
     register(
@@ -110,12 +112,14 @@ def _register_all() -> None:
             position_fn=tsmom,
             default_grid={"lookback": [21, 63, 126, 189, 252], "long_only": [False]},
             default_symbols=["SPY"],
+            monthly_grid={"lookback": [1, 3, 6, 9, 12], "long_only": [False, True]},
+            monthly_symbols=["WB_BRENT"],
         )
     )
     register(
         Strategy(
             name="sector_mom",
-            description="12-1 cross-sectional momentum across SPDR sector ETFs",
+            description="Cross-sectional momentum (top-k of a basket; SPDR sectors or commodities)",
             position_fn=sector_mom,
             default_grid={
                 "lookback": [126, 189, 252],
@@ -133,6 +137,8 @@ def _register_all() -> None:
                 "XLU",
                 "XLB",
             ],
+            monthly_grid={"lookback": [3, 6, 9, 12], "skip": [1], "top_k": [2, 3, 4]},
+            monthly_symbols=["WB_GOLD", "WB_SILVER", "WB_COPPER", "WB_ALUMINUM", "WB_BRENT", "WB_WHEAT", "WB_MAIZE", "WB_SOYBEANS"],
         )
     )
     register(
@@ -147,6 +153,9 @@ def _register_all() -> None:
                 "long_only": [True],
             },
             default_symbols=["SPY"],
+            monthly_grid={"window": [3, 6, 12], "low": [20, 30, 40], "high": [60, 70, 80],
+                          "long_only": [True]},
+            monthly_symbols=["WB_GOLD"],
         )
     )
     register(
@@ -156,6 +165,8 @@ def _register_all() -> None:
             position_fn=bollinger,
             default_grid={"window": [10, 20, 40], "k": [1.5, 2.0, 2.5], "long_only": [True]},
             default_symbols=["SPY"],
+            monthly_grid={"window": [6, 12, 24], "k": [1.5, 2.0, 2.5], "long_only": [True]},
+            monthly_symbols=["WB_GOLD"],
         )
     )
     register(
@@ -165,6 +176,8 @@ def _register_all() -> None:
             position_fn=buy_hold,
             default_grid={},
             default_symbols=["SPY"],
+            monthly_grid={},
+            monthly_symbols=["WB_GOLD"],
         )
     )
 

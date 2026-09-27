@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 
 from mirage.backtest import perf_stats, run_backtest
-from mirage.data import data_hash, load_close
+from mirage.data import data_hash, load_close, periods_per_year
 from mirage.diagnostics.costs import cost_fragility
 from mirage.diagnostics.cscv import cscv_pbo
 from mirage.diagnostics.haircuts import haircut_adjusted_pvalues
@@ -43,6 +43,7 @@ class TrialResult:
     turnover: pd.Series
     equity: pd.Series
     entry_id: int
+    periods_per_year: int = 252
 
 
 def run_program(
@@ -71,6 +72,7 @@ def run_program(
     if isinstance(prices, pd.Series):
         prices = prices.to_frame()
     dhash = data_hash(symbols)
+    ppy = periods_per_year(symbols)
     ledger = ledger or Ledger()
     program_id = program_id or new_program_id(f"{family}-{symbols[0]}")
 
@@ -78,8 +80,9 @@ def run_program(
     for i, params in enumerate(combos):
         pos = spec.position_fn(prices, params)
         bt = run_backtest(prices, pos, cost_bps=cost_bps,
-                          slippage_bps=slippage_bps, vol_target=vol_target)
-        metrics = perf_stats(bt.returns)
+                          slippage_bps=slippage_bps, vol_target=vol_target,
+                          periods_per_year=ppy)
+        metrics = perf_stats(bt.returns, ppy)
         metrics["n_trades"] = bt.n_trades
         metrics["total_turnover"] = bt.total_turnover
         label = f"{family}[{i}] {json.dumps(params, sort_keys=True)}"
@@ -90,6 +93,7 @@ def run_program(
             "cost_bps": cost_bps,
             "slippage_bps": slippage_bps,
             "vol_target": vol_target,
+            "periods_per_year": ppy,
         }
         returns_sha = hashlib.sha256(
             np.ascontiguousarray(bt.returns.to_numpy()).tobytes()
@@ -105,6 +109,7 @@ def run_program(
                 turnover=bt.turnover,
                 equity=bt.equity,
                 entry_id=entry.id,
+                periods_per_year=ppy,
             )
         )
     return program_id, results
@@ -122,8 +127,9 @@ def analyze_trials(
     if not trials:
         raise ValueError("no trials to analyze")
 
+    ppy = trials[0].periods_per_year
     rets = pd.DataFrame({t.label: t.returns for t in trials}).fillna(0.0)
-    trial_sharpes = np.array([sharpe_ratio(rets[c].to_numpy()) for c in rets.columns])
+    trial_sharpes = np.array([sharpe_ratio(rets[c].to_numpy(), ppy) for c in rets.columns])
     best_i = int(np.argmax(trial_sharpes))
     best = trials[best_i]
 
@@ -131,17 +137,18 @@ def analyze_trials(
     best_rets = best.returns.to_numpy()
     best_is_sharpe = float(trial_sharpes[best_i])
 
-    dsr_p = dsr(best_rets, trial_sharpes)
-    psr_p = psr(best_rets)
+    dsr_p = dsr(best_rets, trial_sharpes, periods_per_year=ppy)
+    psr_p = psr(best_rets, periods_per_year=ppy)
     e_max = dsr_expected_max_sharpe(trial_sharpes)
-    min_btl = min_backtest_length(best_rets)
+    min_btl = min_backtest_length(best_rets, periods_per_year=ppy)
 
     # per-trial PSR p-values -> multiple-testing haircuts
-    pvals = np.array([1 - psr(rets[c].to_numpy()) for c in rets.columns])
+    pvals = np.array([1 - psr(rets[c].to_numpy(), periods_per_year=ppy)
+                      for c in rets.columns])
     pvals = np.clip(pvals, 1e-12, 1.0)
     haircuts = haircut_adjusted_pvalues(pvals)
 
-    cscv = cscv_pbo(rets.to_numpy(), n_blocks=n_blocks)
+    cscv = cscv_pbo(rets.to_numpy(), n_blocks=n_blocks, periods_per_year=ppy)
     is_median = float(np.median(cscv.is_sharpes))
     oos_median = float(np.median(cscv.oos_sharpes))
 
@@ -159,6 +166,7 @@ def analyze_trials(
     frag = cost_fragility(
         best.gross_returns.to_numpy(), best.turnover.to_numpy(),
         assumed_cost_bps=assumed_cost_bps,
+        periods_per_year=ppy,
     )
 
     verdict = build_verdict(
@@ -173,12 +181,15 @@ def analyze_trials(
         n_trials=len(trials),
         rc_p=rc_p,
         breakeven_capped=frag.capped,
+        period_unit="months" if ppy == 12 else "days",
     )
 
     eq = (1.0 + rets).cumprod()
     return {
         "n_trials": len(trials),
         "n_days": n_days,
+        "periods_per_year": ppy,
+        "frequency": "monthly" if ppy == 12 else "daily",
         "best_index": best_i,
         "best_label": best.label,
         "best_config": best.config,
@@ -248,6 +259,7 @@ def analyze_returns_matrix(
     n_blocks: int = 16,
     n_bootstrap: int = 500,
     seed: int = 0,
+    periods_per_year: int = 252,
 ) -> dict[str, Any]:
     """Analyze an externally supplied T x N returns matrix (the audit path).
 
@@ -259,7 +271,7 @@ def analyze_returns_matrix(
     trials: list[TrialResult] = []
     for col in returns.columns:
         r = returns[col].fillna(0.0)
-        metrics = perf_stats(r)
+        metrics = perf_stats(r, periods_per_year)
         gross = r.copy()
         # unknown turnover: assume the return stream is net of zero cost and
         # charge the declared cost per nonzero day (turnover=1) for fragility
@@ -274,6 +286,7 @@ def analyze_returns_matrix(
                 turnover=turnover,
                 equity=(1.0 + r).cumprod(),
                 entry_id=-1,
+                periods_per_year=periods_per_year,
             )
         )
     return analyze_trials(

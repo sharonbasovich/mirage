@@ -1,0 +1,97 @@
+{
+    "certificate": "mirage-trial-ledger",
+    "version": 2,
+    "integrity_note": "chain_head is a SHA-256 hash chain over this program's ledger. It detects uncoordinated edits within an intact ledger; it is not a digital signature and does not prove the ledger was never rewritten as a whole. Publish the chain head externally to anchor it.",
+    "program_id": "ma_cross-WB_GOLD-bc655c17",
+    "issued_at": 1790516774.1645355,
+    "trial_count": 12,
+    "first_trial_ts": 1790516661.7296908,
+    "last_trial_ts": 1790516661.772904,
+    "chain_head": "21b7c84b4116182d71444c01eaeb601578ff113e160a3d06c9b49c2aa1f0e880",
+    "chain_valid": true,
+    "chain_message": "chain intact",
+    "best_trial": {
+        "entry_id": 18,
+        "label": "ma_cross[5] {\"fast\": 3, \"long_only\": true, \"slow\": 12}",
+        "config": {
+            "cost_bps": 5.0,
+            "family": "ma_cross",
+            "params": {
+                "fast": 3,
+                "long_only": true,
+                "slow": 12
+            },
+            "periods_per_year": 12,
+            "slippage_bps": 0.0,
+            "symbols": [
+                "WB_GOLD"
+            ],
+            "vol_target": null
+        },
+        "metrics": {
+            "ann_return": 0.09929504438052605,
+            "ann_vol": 0.14770205189574176,
+            "days": 668,
+            "max_drawdown": -0.32806128116081723,
+            "n_trades": 42,
+            "sharpe": 0.712314583057895,
+            "total_turnover": 42.0
+        }
+    },
+    "verdict": {
+        "score": 81.2,
+        "label": "Unclear",
+        "components": [
+            {
+                "key": "dsr",
+                "label": "Deflated Sharpe p-value",
+                "weight": 0.2,
+                "score": 100.0,
+                "detail": "DSR p-value = 1.00 across 12 trials"
+            },
+            {
+                "key": "pbo",
+                "label": "PBO (CSCV)",
+                "weight": 0.25,
+                "score": 76.8,
+                "detail": "PBO = 0.23: probability the IS winner is below median OOS"
+            },
+            {
+                "key": "rc",
+                "label": "Reality Check",
+                "weight": 0.2,
+                "score": 41.0,
+                "detail": "White RC p = 0.59: does the best trial beat the benchmark beyond luck?"
+            },
+            {
+                "key": "degradation",
+                "label": "IS-vs-OOS retention",
+                "weight": 0.15,
+                "score": 92.0,
+                "detail": "median OOS Sharpe 0.68 vs median IS 0.73 across CSCV splits"
+            },
+            {
+                "key": "cost_fragility",
+                "label": "Cost fragility",
+                "weight": 0.1,
+                "score": 100.0,
+                "detail": "> 300 bps (never crosses zero on the grid)"
+            },
+            {
+                "key": "length",
+                "label": "Backtest length",
+                "weight": 0.1,
+                "score": 100.0,
+                "detail": "668 months vs minimum 47 required"
+            }
+        ],
+        "narrative": [
+            "The Deflated Sharpe Ratio still assigns 100% probability to genuine skill after accounting for 12 trials.",
+            "The in-sample winner stayed above the OOS median in 77% of splits.",
+            "The best trial does not beat the benchmark beyond luck (Reality Check p = 0.59).",
+            "Score cleared the Survives bar, but the Reality Check does not confirm the edge beats the benchmark beyond luck - label capped at Unclear."
+        ]
+    },
+    "disclaimer": "Research prototype built for GIBC V2. Not a product, not a financial service, not financial advice.",
+    "data_hash": "a40e55e6ecf99b7f3f0b5f6253c9076c48dffe5c73c78cc07454159b1f9a0650"
+}

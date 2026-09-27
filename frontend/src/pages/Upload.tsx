@@ -1,24 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useResult } from "../App";
+import type { SymbolInfo } from "../types";
 
 export default function Upload() {
   const [file, setFile] = useState<File | null>(null);
   const [nTrials, setNTrials] = useState(50);
-  const [bench, setBench] = useState("SPY");
+  const [bench, setBench] = useState("");
+  const [freq, setFreq] = useState<"daily" | "monthly">("daily");
+  const [symbols, setSymbols] = useState<SymbolInfo[]>([]);
   const [cost, setCost] = useState(5);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const { setResult } = useResult();
   const nav = useNavigate();
 
+  useEffect(() => {
+    api.symbols().then(setSymbols).catch(() => {});
+  }, []);
+  const benchOptions = symbols.filter((s) => s.frequency === freq);
+
   const submit = async () => {
     if (!file) return;
     setBusy(true);
     setErr(null);
     try {
-      const r = await api.audit(file, nTrials, bench, cost);
+      const r = await api.audit(file, nTrials, bench, cost, freq);
       setResult("audit", r.analysis);
       nav("/verdict");
     } catch (e) {
@@ -54,7 +62,7 @@ export default function Upload() {
       <div className="card">
         <h1 className="text-xl font-bold mb-1">Audit an external backtest</h1>
         <p className="text-sm text-dim mb-5">
-          Built your strategy in another tool? Upload a CSV of daily returns —
+          Built your strategy in another tool? Upload a CSV of daily or monthly returns —
           one column per tried configuration — and declare how many total
           parameter combinations you searched. Mirage runs the same diagnostic
           battery and verdict.
@@ -72,24 +80,41 @@ export default function Upload() {
               download a sample CSV
             </button>
           </div>
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-4 gap-4">
             <div>
               <label className="label">Declared # trials</label>
               <input
                 className="input"
                 type="number"
                 min={1}
+                max={100000}
                 value={nTrials}
                 onChange={(e) => setNTrials(+e.target.value)}
               />
             </div>
             <div>
+              <label className="label">Frequency</label>
+              <select
+                className="input"
+                value={freq}
+                onChange={(e) => {
+                  setFreq(e.target.value as "daily" | "monthly");
+                  setBench("");
+                }}
+              >
+                <option value="daily">daily</option>
+                <option value="monthly">monthly</option>
+              </select>
+            </div>
+            <div>
               <label className="label">Benchmark</label>
               <select className="input" value={bench} onChange={(e) => setBench(e.target.value)}>
-                <option value="SPY">SPY</option>
-                <option value="QQQ">QQQ</option>
-                <option value="TLT">TLT</option>
                 <option value="">(none)</option>
+                {benchOptions.map((s) => (
+                  <option key={s.symbol} value={s.symbol}>
+                    {s.symbol}
+                  </option>
+                ))}
               </select>
             </div>
             <div>

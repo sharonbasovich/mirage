@@ -50,7 +50,7 @@ def scene_lab(page):
 def scene_run(page):
     page.goto(BASE, wait_until="networkidle")
     page.wait_for_selector("text=Strategy Zoo")
-    page.get_by_text("MA-Crossover Zoo on SPY").click()
+    page.get_by_text("MA-Crossover Zoo on Gold (monthly, World Bank)").click()
     page.wait_for_url("**/verdict", timeout=240_000)
     page.wait_for_selector("text=Mirage Score", timeout=240_000)
     page.wait_for_timeout(4000)
@@ -80,7 +80,10 @@ def scene_verdict_detail(page):
 def scene_ledger(page):
     page.goto(f"{BASE}/ledger", wait_until="networkidle")
     page.wait_for_selector("text=Ledger")
-    page.wait_for_timeout(4000)
+    page.wait_for_timeout(1500)
+    page.locator("button:has-text('trials')").first.click()
+    page.wait_for_selector("div.label:has-text('chain head')", timeout=30_000)
+    page.wait_for_timeout(3000)
     page.mouse.wheel(0, 600)
     page.wait_for_timeout(2500)
 

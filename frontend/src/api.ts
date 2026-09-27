@@ -42,12 +42,19 @@ export const api = {
   trials: (pid: string) => req<LedgerEntryInfo[]>(`/api/programs/${pid}/trials`),
   certificate: (pid: string) => req<Certificate>(`/api/programs/${pid}/certificate`),
   ledgerVerify: () => req<{ valid: boolean; message: string }>("/api/ledger/verify"),
-  audit: (file: File, nTrials: number, benchmark: string, costBps: number) => {
+  audit: (
+    file: File,
+    nTrials: number,
+    benchmark: string,
+    costBps: number,
+    frequency: "daily" | "monthly",
+  ) => {
     const fd = new FormData();
     fd.append("file", file);
     fd.append("n_trials", String(nTrials));
     fd.append("benchmark", benchmark);
     fd.append("cost_bps", String(costBps));
+    fd.append("frequency", frequency);
     return req<{ program_id: string; analysis: Analysis }>("/api/audit", {
       method: "POST",
       body: fd,

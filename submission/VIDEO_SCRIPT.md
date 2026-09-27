@@ -1,23 +1,24 @@
-# Mirage demo video script (~3:15)
+# Mirage demo video script (2:31)
 
-Shot list + narration. Subtitles in `submission/mirage.srt` mirror the narration
-column. Video: 1920x1080 MP4, burned-in English subtitles.
+Final file: `submission/mirage_demo.mp4`, 1920x1080, h264 + AAC Piper TTS
+narration (en_US-lessac-medium, offline), burned-in English subtitles
+(`submission/mirage.srt`). The narration below is the exact cue text in
+`scripts/assemble_video.py`.
 
-| Time | On screen | Narration / subtitle |
+| Segment | On screen | Narration / subtitle |
 |---|---|---|
-| 0:00–0:15 | Title card: "MIRAGE — the backtest lie detector" | "Anyone can build a trading strategy with a three-hundred percent backtest. Almost none survive live. The reason isn't bad code — it's selection bias." |
-| 0:15–0:35 | E1 histogram figure (reports/figures/e1_sharpe_histogram.png) | "We ran one thousand random, zero-skill strategies on real S-and-P data. The best backtest looks great — a Sharpe of point six. It's pure luck, and the math knows it." |
-| 0:35–1:00 | App opens on Strategy Lab; click "MA Crossover Zoo" preset | "Mirage backtests your strategy grid and — critically — remembers every single trial in a tamper-evident Trial Ledger. Pre-registration for backtests. You can't quietly delete the losers." |
-| 1:00–1:35 | Trials run; Verdict page fills: gauge, component table, λ histogram, IS-vs-OOS scatter, cost curve | "Then Mirage runs the academic overfitting battery. The Deflated Sharpe Ratio deflates your best result by how many things you tried. The CSCV test splits history sixteen ways and asks: how often does the in-sample winner underperform? Here — sixty-five percent of the time. Flagged unclear, leaning overfit. Don't trust it." |
-| 1:35–2:00 | Ledger page: entries table, hash chain, certificate JSON | "Every trial is hash-chained — timestamp, config hash, data hash. Export a pre-registration certificate any third party can verify." |
-| 2:00–2:20 | Upload page: drop a CSV, get a verdict | "Already used another backtester? Upload your returns and a trial count — Mirage audits the field, not just its own runs." |
-| 2:20–2:45 | E2 ROC + power figures | "And Mirage validates itself. On synthetic markets with planted skill we measured the detector's own error rate — ROC AUC point nine — and publish the curves. A metrology tool that reports its own measurement error." |
-| 2:45–3:05 | E3 scorecard figure + verdict recap | "DSR alone misses forty-five percent of zero-skill zoos — correlated trials break its math. The combined battery misses none. That's why the verdict is a battery, not a number." |
-| 3:05–3:15 | End card: repo URL + "not financial advice" | "Mirage — free, open source, MIT licensed. Stop trusting your own backtests." |
+| Title | "MIRAGE — the backtest lie detector" | Anyone can build a trading strategy with a three-hundred-percent backtest. Almost none survive live. The reason isn't bad code — it's selection bias. |
+| E1 figure | `reports/figures/e1_sharpe_histogram.png` (E1 on user-fetched Yahoo SPY data) | We ran one thousand random, zero-skill strategies on real S&P data. The best backtest looks great — a Sharpe of 0.61. It's pure luck, and the math knows it. |
+| Strategy Lab | bundled World Bank universe + Strategy Zoo | Mirage backtests your strategy grid on historical data with realistic costs, and remembers every single trial. |
+| Run | click "MA-Crossover Zoo on Gold (monthly, World Bank)" | Every trial lands in a hash-chained Trial Ledger, so the trial count can't quietly shrink inside the ledger. Then the overfitting battery runs: Deflated Sharpe Ratio, CSCV, Reality Check. |
+| Verdict | gauge 81, component table, charts | This zoo runs on bundled, openly licensed World Bank gold prices. The overfitting risk is low, twenty-three percent, but the best trial does not beat simply holding gold beyond luck. Reality Check p is point five nine, so the verdict is capped at unclear. |
+| Ledger | entries, chain head, unsigned certificate | Every trial is hash-chained — timestamp, config hash, data hash. Export a certificate with the chain head, and publish it to anchor the record. |
+| Upload | synthetic returns CSV audit | Already used another backtester? Upload your returns and a trial count — Mirage audits the field, not just its own runs. |
+| About | methods + citations | Every method is from the published literature — Deflated Sharpe Ratio, CSCV, White's Reality Check, purged cross-validation — with formulas and citations on the methods page. |
+| E2 figure | ROC / power | And Mirage validates itself — planted-skill experiments measure the detector's own ROC AUC at point nine, and the verdict label's own accuracy on ground truth. |
+| E3 figure | scorecard | DSR alone misses forty-five percent of zero-skill zoos — the combined battery misses none. The verdict is a battery, not a number. |
+| End card | repo URL + disclaimer | Mirage — free, open source, MIT licensed. Stop trusting your own backtests. |
 
-## Production notes
-
-- Driven by `scripts/record_demo.py` (Playwright `record_video_dir`), assembled
-  with ffmpeg; SRT burned in.
-- Keep each UI segment ≥ ~12 s so subtitles are readable.
-- Optional narration: `espeak-ng` (free, offline) — subtitles alone are fine.
+Reproduce: start the API with an empty `MIRAGE_YAHOO_DIR` (public
+configuration), then run `python scripts/record_demo.py` and
+`python scripts/assemble_video.py`.

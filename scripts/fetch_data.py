@@ -1,19 +1,20 @@
 """Refresh the cached OHLCV data used by Mirage.
 
-Source: Yahoo Finance via yfinance (free, no API key).
-Data is committed to the repo so the whole project runs offline;
-re-run this script to refresh the cache.
+Source: Yahoo Finance via yfinance (free, no API key). Yahoo data is NOT
+redistributed with Mirage: this script downloads it into a local, per-user
+cache ($MIRAGE_YAHOO_DIR or ~/.cache/mirage/yahoo) for your own research use,
+subject to Yahoo's terms (https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html).
+Requires ``pip install -e ".[data]"``.
 """
 
 from __future__ import annotations
 
 import sys
-from pathlib import Path
 
 import pandas as pd
 import yfinance as yf
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+from mirage.data import yahoo_dir
 
 SYMBOLS = {
     # Broad market / macro ETFs
@@ -43,6 +44,7 @@ START = "2005-01-01"
 
 
 def main() -> int:
+    DATA_DIR = yahoo_dir()
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     failures: list[str] = []
     for name, ticker in SYMBOLS.items():

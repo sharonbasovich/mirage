@@ -2,16 +2,21 @@
 
 Every backtest run appends an entry recording the research program, the
 strategy config hash, the data hash, metrics and a pointer to the previous
-entry's hash.  Any edit to history breaks the chain, which ``verify_chain``
-detects.  The ledger powers "pre-registration for backtests": the Deflated
-Sharpe Ratio uses the *recorded* trial count, which cannot be silently
-forgotten.
+entry's hash.  ``verify_chain`` detects an uncoordinated edit or deletion
+inside an otherwise intact ledger file.  It is *not* externally anchored or
+signed: someone with write access can rewrite the whole database and
+recompute every hash, and that cannot be detected from the file alone.  To
+make a program's history checkable later, publish its chain head (for
+example in a commit or a post) when you start.  The Deflated Sharpe Ratio
+uses the trial count recorded here, not a count the user types in.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import os
+import re
 import sqlite3
 import time
 import uuid
@@ -19,7 +24,16 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-DEFAULT_DB = Path(__file__).resolve().parent.parent / "data" / "ledger.sqlite3"
+
+def state_dir() -> Path:
+    """Writable state (ledger + stored analyses): $MIRAGE_STATE_DIR or ~/.local/share/mirage."""
+    env = os.environ.get("MIRAGE_STATE_DIR")
+    return Path(env) if env else Path.home() / ".local" / "share" / "mirage"
+
+
+def default_db() -> Path:
+    return state_dir() / "ledger.sqlite3"
+
 
 GENESIS = "0" * 64
 
@@ -48,8 +62,8 @@ class LedgerEntry:
 
 
 class Ledger:
-    def __init__(self, db_path: str | Path = DEFAULT_DB):
-        self.db_path = Path(db_path)
+    def __init__(self, db_path: str | Path | None = None):
+        self.db_path = Path(db_path) if db_path is not None else default_db()
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init()
 
@@ -178,13 +192,19 @@ class Ledger:
         return True, "chain intact"
 
     def export_certificate(self, program_id: str, verdict: dict | None = None) -> dict:
-        """Backtest Pre-registration Certificate for a program."""
+        """Trial-ledger certificate for a program (hash-chain summary, unsigned)."""
         entries = self.entries(program_id)
         ok, msg = self.verify_chain()
         best = max(entries, key=lambda e: e.metrics.get("sharpe", float("-inf")), default=None)
         return {
-            "certificate": "mirage-pre-registration",
-            "version": 1,
+            "certificate": "mirage-trial-ledger",
+            "version": 2,
+            "integrity_note": (
+                "chain_head is a SHA-256 hash chain over this program's ledger. It "
+                "detects uncoordinated edits within an intact ledger; it is not a "
+                "digital signature and does not prove the ledger was never rewritten "
+                "as a whole. Publish the chain head externally to anchor it."
+            ),
             "program_id": program_id,
             "issued_at": time.time(),
             "trial_count": len(entries),
@@ -209,5 +229,10 @@ class Ledger:
         }
 
 
+PROGRAM_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,80}$")
+
+
 def new_program_id(name: str) -> str:
-    return f"{name}-{uuid.uuid4().hex[:8]}"
+    """``<sanitized name>-<8 hex>``; always matches ``PROGRAM_ID_RE``."""
+    safe = re.sub(r"[^A-Za-z0-9_-]+", "-", name).strip("-")[:60] or "program"
+    return f"{safe}-{uuid.uuid4().hex[:8]}"

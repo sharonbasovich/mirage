@@ -63,6 +63,7 @@ def build_verdict(
     n_trials: int,
     rc_p: float | None = None,
     breakeven_capped: bool = False,
+    period_unit: str = "days",
 ) -> Verdict:
     comps: list[Component] = []
     narrative: list[str] = []
@@ -138,14 +139,14 @@ def build_verdict(
 
     if np.isfinite(min_btl) and min_btl > 0:
         s_len = _clip(100 * min(n_days / min_btl, 1.0))
-        len_detail = f"{n_days} days vs minimum {min_btl:.0f} required"
+        len_detail = f"{n_days} {period_unit} vs minimum {min_btl:.0f} required"
     else:
         s_len = 0.0
         len_detail = "minimum length unbounded (Sharpe <= benchmark)"
     comps.append(Component("length", "Backtest length", WEIGHTS["length"], s_len, len_detail))
     if np.isfinite(min_btl) and n_days < min_btl:
         narrative.append(
-            f"The backtest covers {n_days} days but needs ~{min_btl:.0f} for the "
+            f"The backtest covers {n_days} {period_unit} but needs ~{min_btl:.0f} for the "
             f"claimed Sharpe to be significant at 95%."
         )
 

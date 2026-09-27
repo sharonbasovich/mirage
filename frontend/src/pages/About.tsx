@@ -58,8 +58,9 @@ export default function About() {
           Anyone can find a parameter combination with a great backtest. With
           enough tries, luck guarantees it. Clinical trials solved this problem
           with pre-registration and multiple-testing corrections; quant research
-          mostly has not. Mirage records <em>every</em> trial in a tamper-evident
-          ledger, then asks the question that matters:{" "}
+          mostly has not. Mirage borrows the idea: it records <em>every</em> trial
+          in a hash-chained ledger that detects edits or deletions inside an
+          intact ledger (it is not signed or externally anchored), then asks the question that matters:{" "}
           <em>would the best of what you tried still look good if you hadn't
           cherry-picked it?</em>
         </p>
@@ -77,8 +78,8 @@ export default function About() {
       <div className="card">
         <h2 className="font-bold mb-2">Backtester convention</h2>
         <p className="text-sm text-gray-300">
-          Signals computed from data through close of day t become positions at
-          t+1 (strict no-lookahead). Costs are charged per unit of one-way
+          Signals computed from data through the close of bar t become positions at
+          bar t+1 (day or month) (strict no-lookahead). Costs are charged per unit of one-way
           turnover. The optional volatility target uses only trailing realized
           vol.
         </p>
@@ -86,9 +87,11 @@ export default function About() {
       <div className="card">
         <h2 className="font-bold mb-2">Mirage Score</h2>
         <p className="text-sm text-gray-300">
-          0–100 weighted composite of: DSR p-value (25%), 1−PBO (25%), IS-vs-OOS
-          Sharpe retention (20%), cost breakeven (15%), sample length vs MinBTL
-          (15%). Labels: ≥65 <span className="text-good">Survives</span>, 40–65{" "}
+          0–100 weighted composite of: DSR p-value (20%), 1−PBO (25%), Reality
+          Check 1−p (20%), IS-vs-OOS Sharpe retention (15%), cost breakeven
+          (10%), sample length vs MinBTL (10%). Without a benchmark the Reality
+          Check is dropped and the weights renormalized; a Reality Check p &gt; 0.5
+          caps the label at Unclear. Labels: ≥65 <span className="text-good">Survives</span>, 40–65{" "}
           <span className="text-warn">Unclear</span>, &lt;40{" "}
           <span className="text-bad">Mirage</span> (likely overfit). The full
           component table is always shown — the score is transparent, not a
@@ -97,10 +100,13 @@ export default function About() {
       </div>
       <div className="card text-xs text-dim leading-relaxed">
         <p>
-          <span className="text-gray-300 font-semibold">Data.</span> Daily OHLCV
-          for SPY, QQQ, IWM, TLT, GLD, 11 SPDR sector ETFs, BTC-USD, ETH-USD via
-          Yahoo Finance (yfinance), cached in the repo; historical simulation
-          only. This is a research prototype built for GIBC V2 — not a product,
+          <span className="text-gray-300 font-semibold">Data.</span> Bundled:
+          World Bank Commodity Price Data (The Pink Sheet), monthly nominal USD
+          prices for 15 commodities, 1971 onward, licensed CC BY 4.0
+          (datacatalog.worldbank.org, dataset 0038238). Optional: daily ETF and
+          crypto OHLCV that each user fetches from Yahoo Finance into a local
+          cache with scripts/fetch_data.py, under Yahoo's terms. Yahoo data is
+          not redistributed. Historical simulation only. This is a research prototype built for GIBC V2 — not a product,
           not a financial service, not financial advice.
         </p>
       </div>

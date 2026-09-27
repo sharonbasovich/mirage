@@ -10,7 +10,7 @@ FROM python:3.12-slim
 WORKDIR /app
 COPY pyproject.toml ./
 COPY mirage/ ./mirage/
-COPY data/ ./data/
+COPY data/worldbank/ ./data/worldbank/
 RUN pip install --no-cache-dir .
 COPY --from=frontend /app/frontend/dist ./frontend/dist
 EXPOSE 8000

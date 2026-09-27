@@ -69,13 +69,14 @@ export default function Verdict() {
 
   const a = analysis;
   const v = a.verdict;
+  const unit = a.frequency === "monthly" ? "months" : "days";
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-xl font-bold">Autopsy report</h1>
         <span className="text-xs text-dim font-mono">{programId}</span>
         <span className="text-xs text-dim">
-          {a.n_trials} recorded trials · {a.n_days} days
+          {a.n_trials} recorded trials · {a.n_days} {unit}
           {a.declared_trials ? ` · ${a.declared_trials} declared` : ""}
         </span>
       </div>
@@ -188,10 +189,10 @@ export default function Verdict() {
           <h2 className="font-bold mb-1">Min backtest length</h2>
           <p className="text-xs text-dim mb-3">Bailey &amp; López de Prado (2012)</p>
           <div className="stat-num">
-            {Number.isFinite(a.min_btl) ? `${a.min_btl.toFixed(0)} days` : "���"}
+            {Number.isFinite(a.min_btl) ? `${a.min_btl.toFixed(0)} ${unit}` : "���"}
           </div>
           <p className="text-xs text-dim mt-2">
-            sample has {a.n_days.toLocaleString()} days
+            sample has {a.n_days.toLocaleString()} {unit}
           </p>
           <h3 className="font-bold mt-5 mb-1 text-sm">Multiple-testing haircuts</h3>
           <table className="data">

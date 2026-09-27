@@ -35,8 +35,10 @@ export default function Ledger() {
         <div className="card">
           <h1 className="text-xl font-bold mb-1">Trial Ledger</h1>
           <p className="text-xs text-dim mb-4">
-            Every backtest run appends a hash-chained entry — pre-registration
-            for backtests. Tampering breaks the chain.
+            Every backtest run appends a hash-chained entry. Editing or deleting a
+            row inside an intact ledger breaks the chain. The chain is not signed
+            or externally anchored, so a full rewrite of the database cannot be
+            detected. Publish a program's chain head to anchor it.
           </p>
           <div className={`text-xs px-3 py-2 rounded-lg border mb-4 ${
             chain?.valid ? "border-good/40 text-good" : "border-bad/40 text-bad"
@@ -75,7 +77,7 @@ export default function Ledger() {
           <>
             {cert && (
               <div className="card">
-                <h2 className="font-bold mb-2">Pre-registration certificate</h2>
+                <h2 className="font-bold mb-2">Trial-ledger certificate (unsigned)</h2>
                 <div className="grid sm:grid-cols-2 gap-3 text-sm">
                   <div>
                     <div className="label">trials recorded</div>
