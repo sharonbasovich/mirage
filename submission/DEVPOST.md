@@ -149,7 +149,8 @@ detector's own error rates belong next to its verdicts.
 
 ## Try it out
 
-- **Live app:** [DEPLOYED URL — pending deploy approval and smoke test]
+- **Run locally:** follow the setup and launch steps in the README; this is a
+  historical-simulation research prototype.
 - **Source:** https://github.com/sharonbasovich/mirage
 - **Demo video:** [YOUTUBE URL — human uploads; script in submission/VIDEO_SCRIPT.md]
 

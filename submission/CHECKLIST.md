@@ -9,15 +9,14 @@
 | Built With tag list | `submission/DEVPOST.md` → "Built With" | done |
 | Hosted demo video, 2–5 min | `submission/mirage_demo.mp4` (3:03, 1920×1080, h264 + AAC narration, burned English subtitles) | file done; **YouTube upload pending (human)** |
 | ≥ 3 screenshots | `submission/screenshots/` (9 UI PNGs) + `reports/figures/` | done |
-| Public repo | https://github.com/sharonbasovich/mirage (public, exists) | `main` at `69290c5`; hardening `1206247` on review branch [`codex/gibc-worldbank-audit`](https://github.com/sharonbasovich/mirage/tree/codex/gibc-worldbank-audit); submission-audit follow-up delivered as bundle, **push + merge pending (human)** |
-| Live/deployed project | Devin built-in backend deploy (free) | **approval pending**; URL goes into README/DEVPOST after smoke test |
+| Public repo | https://github.com/sharonbasovich/mirage (public, exists) | `main` and [`codex/gibc-worldbank-audit`](https://github.com/sharonbasovich/mirage/tree/codex/gibc-worldbank-audit) at `5a75fcf`; E2/E4 result JSON committed |
+| Live/deployed project | Optional public demo; rules require a working prototype and hosted video | Devin built-in deploy approval pending; no live URL yet |
 
 ## Human TODO before submit
 
-- [ ] Push the submission-audit bundle commit onto `codex/gibc-worldbank-audit`, review, merge to `main`
-- [ ] Approve the Devin deploy (built-in, free) in the Devin session
-- [ ] After smoke test (Strategy Lab → Verdict → Ledger → certificate), paste deployed URL into README + DEVPOST "Try it out"
-- [ ] Upload `mirage_demo.mp4` to YouTube (unlisted ok), paste link into Devpost
+- [x] Push the audited source and reproducible E2/E4 results to `main`
+- [ ] Optional: approve the Devin deploy, smoke-test it, and add its URL
+- [ ] Upload `mirage_demo.mp4` to YouTube, Vimeo, or Youku (unlisted ok), paste link into Devpost
 - [ ] Submit on Devpost before **Oct 1 2026, 15:45 UTC** (not yet submitted)
 
 ## Track 02 rules / constraints
