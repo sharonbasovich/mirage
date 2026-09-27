@@ -1,17 +1,17 @@
 {
     "certificate": "mirage-trial-ledger",
     "version": 2,
-    "integrity_note": "chain_head is a SHA-256 hash chain over this program's ledger. It detects uncoordinated edits within an intact ledger; it is not a digital signature and does not prove the ledger was never rewritten as a whole. Publish the chain head externally to anchor it.",
-    "program_id": "ma_cross-WB_GOLD-bc655c17",
-    "issued_at": 1790516774.1645355,
+    "integrity_note": "chain_head is a SHA-256 hash chain over this program's ledger. It detects uncoordinated edits within an intact ledger; it is not a digital signature and does not prove the ledger was never rewritten as a whole. It is unsigned and not externally anchored; no chain head is published by Mirage.",
+    "program_id": "ma_cross-WB_GOLD-105d5f0f",
+    "issued_at": 1790531834.5002818,
     "trial_count": 12,
-    "first_trial_ts": 1790516661.7296908,
-    "last_trial_ts": 1790516661.772904,
-    "chain_head": "21b7c84b4116182d71444c01eaeb601578ff113e160a3d06c9b49c2aa1f0e880",
+    "first_trial_ts": 1790531759.0115042,
+    "last_trial_ts": 1790531759.0592327,
+    "chain_head": "f13b7701272c8de7b295494bf5bc200aa5085dad767a4084b24f8c4b4d2b5f20",
     "chain_valid": true,
     "chain_message": "chain intact",
     "best_trial": {
-        "entry_id": 18,
+        "entry_id": 6,
         "label": "ma_cross[5] {\"fast\": 3, \"long_only\": true, \"slow\": 12}",
         "config": {
             "cost_bps": 5.0,
@@ -44,10 +44,10 @@
         "components": [
             {
                 "key": "dsr",
-                "label": "Deflated Sharpe p-value",
+                "label": "Deflated Sharpe confidence",
                 "weight": 0.2,
                 "score": 100.0,
-                "detail": "DSR p-value = 1.00 across 12 trials"
+                "detail": "DSR confidence = 1.00 (estimated chance true Sharpe exceeds the best-of-12 luck threshold; not P(skill))"
             },
             {
                 "key": "pbo",
@@ -61,7 +61,7 @@
                 "label": "Reality Check",
                 "weight": 0.2,
                 "score": 41.0,
-                "detail": "White RC p = 0.59: does the best trial beat the benchmark beyond luck?"
+                "detail": "White RC p = 0.59: does the best trial beat the benchmark by more than data-snooping luck?"
             },
             {
                 "key": "degradation",
@@ -86,10 +86,10 @@
             }
         ],
         "narrative": [
-            "The Deflated Sharpe Ratio still assigns 100% probability to genuine skill after accounting for 12 trials.",
+            "The Deflated Sharpe confidence is 1.00: the best Sharpe exceeds the expected best-of-12 luck threshold. This is a model-based exceedance estimate, not the probability that genuine skill exists.",
             "The in-sample winner stayed above the OOS median in 77% of splits.",
-            "The best trial does not beat the benchmark beyond luck (Reality Check p = 0.59).",
-            "Score cleared the Survives bar, but the Reality Check does not confirm the edge beats the benchmark beyond luck - label capped at Unclear."
+            "There is insufficient evidence that the best trial outperforms the benchmark after data snooping (Reality Check p = 0.59); this does not prove the absence of an edge.",
+            "Score cleared the Survives bar, but the Reality Check finds insufficient evidence of outperformance versus the benchmark - label capped at Unclear."
         ]
     },
     "disclaimer": "Research prototype built for GIBC V2. Not a product, not a financial service, not financial advice.",

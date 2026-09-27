@@ -12,3 +12,6 @@ data/analyses/
 submission/video_segments/
 mirage.egg-info/
 en_US-lessac-medium.onnx*
+# optional Yahoo-derived outputs (user-local only, never committed)
+reports/figures/e1_*
+reports/figures/e3_*

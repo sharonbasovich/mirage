@@ -203,7 +203,7 @@ class Ledger:
                 "chain_head is a SHA-256 hash chain over this program's ledger. It "
                 "detects uncoordinated edits within an intact ledger; it is not a "
                 "digital signature and does not prove the ledger was never rewritten "
-                "as a whole. Publish the chain head externally to anchor it."
+                "as a whole. It is unsigned and not externally anchored; no chain head is published by Mirage."
             ),
             "program_id": program_id,
             "issued_at": time.time(),

@@ -71,10 +71,8 @@ def scene_verdict_detail(page):
     page.wait_for_timeout(2500)
     page.mouse.wheel(0, 700)
     page.wait_for_timeout(2500)
-    page.mouse.wheel(0, 700)
-    page.wait_for_timeout(2000)
-    page.mouse.wheel(0, -2100)
-    page.wait_for_timeout(500)
+    page.mouse.wheel(0, -700)
+    page.wait_for_timeout(1500)
 
 
 def scene_ledger(page):
@@ -105,8 +103,8 @@ def scene_about(page):
     for _ in range(4):
         page.mouse.wheel(0, 600)
         page.wait_for_timeout(2000)
-    page.mouse.wheel(0, -2400)
-    page.wait_for_timeout(500)
+    page.mouse.wheel(0, -1200)
+    page.wait_for_timeout(1000)
 
 
 def make_sample_csv():

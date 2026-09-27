@@ -2,13 +2,13 @@ const METHODS = [
   {
     name: "Probabilistic Sharpe Ratio (PSR)",
     formula: "PSR(SR*) = Φ[(SR̂ − SR*)√(T−1) / √(1 − γ₃SR̂ + (γ₄−1)SR̂²/4)]",
-    desc: "Probability that the true Sharpe exceeds a benchmark, with skewness (γ₃) and kurtosis (γ₄) corrections.",
+    desc: "Model-based confidence (a normal-approximation exceedance estimate, not a p-value) that the true Sharpe exceeds a benchmark, with skewness (γ₃) and kurtosis (γ₄) corrections.",
     cite: "Bailey & López de Prado (2012), The Sharpe Ratio Efficient Frontier, J. of Risk 15(2).",
   },
   {
     name: "Deflated Sharpe Ratio (DSR)",
     formula: "DSR = PSR[E[max_N]·√V̂],  E[max_N] ≈ (1−γ)Φ⁻¹(1−1/N) + γΦ⁻¹(1−1/(Ne))",
-    desc: "PSR where the benchmark is the Sharpe you would expect from the best of N lucky trials — the selection-bias haircut. N comes from the Trial Ledger, not your memory.",
+    desc: "PSR where the benchmark is the Sharpe you would expect from the best of N lucky trials — the selection-bias haircut. N comes from the Trial Ledger. It is a confidence estimate, not the probability that genuine skill exists.",
     cite: "Bailey & López de Prado (2014), The Deflated Sharpe Ratio, J. of Portfolio Mgmt 40(5).",
   },
   {
@@ -26,7 +26,7 @@ const METHODS = [
   {
     name: "Stationary-bootstrap Reality Check",
     formula: "p = #(max_k mean(d*_b − d̄) ≥ max_k mean(d)) / B",
-    desc: "Politis–Romano stationary bootstrap (mean block 10) resamples days jointly across all N trials, preserving cross-correlation, to test whether the best strategy beats the benchmark beyond luck.",
+    desc: "Politis–Romano stationary bootstrap (mean block 10) resamples days jointly across all N trials, preserving cross-correlation, to test whether the best strategy outperforms the benchmark beyond data-snooping luck. A large p means insufficient evidence of outperformance, not proof of no edge.",
     cite: "White (2000), A Reality Check for Data Snooping, Econometrica 68(5); Politis & Romano (1994).",
   },
   {
@@ -87,7 +87,7 @@ export default function About() {
       <div className="card">
         <h2 className="font-bold mb-2">Mirage Score</h2>
         <p className="text-sm text-gray-300">
-          0–100 weighted composite of: DSR p-value (20%), 1−PBO (25%), Reality
+          0–100 weighted composite of: DSR confidence (20%), 1−PBO (25%), Reality
           Check 1−p (20%), IS-vs-OOS Sharpe retention (15%), cost breakeven
           (10%), sample length vs MinBTL (10%). Without a benchmark the Reality
           Check is dropped and the weights renormalized; a Reality Check p &gt; 0.5
@@ -100,13 +100,17 @@ export default function About() {
       </div>
       <div className="card text-xs text-dim leading-relaxed">
         <p>
-          <span className="text-gray-300 font-semibold">Data.</span> Bundled:
+          <span className="text-gray-300 font-semibold">Data.</span> Bundled (used by the submitted demo):
           World Bank Commodity Price Data (The Pink Sheet), monthly nominal USD
           prices for 15 commodities, 1971 onward, licensed CC BY 4.0
           (datacatalog.worldbank.org, dataset 0038238). Optional: daily ETF and
-          crypto OHLCV that each user fetches from Yahoo Finance into a local
+          crypto OHLCV, outside the submitted demo, that each user fetches from Yahoo Finance into a local
           cache with scripts/fetch_data.py, under Yahoo's terms. Yahoo data is
-          not redistributed. Historical simulation only. This is a research prototype built for GIBC V2 — not a product,
+          not redistributed and Mirage grants no license to it. Pink Sheet values
+          are monthly reference/spot prices, not an investable return series or
+          executable bars: World Bank backtests are hypothetical price-series
+          illustrations of the diagnostics, not realizable trading P&amp;L, and omit
+          futures roll, storage, financing and execution details. Historical simulation only. This is a research prototype built for GIBC V2 — not a product,
           not a financial service, not financial advice.
         </p>
       </div>

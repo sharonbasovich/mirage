@@ -38,7 +38,7 @@ export default function Ledger() {
             Every backtest run appends a hash-chained entry. Editing or deleting a
             row inside an intact ledger breaks the chain. The chain is not signed
             or externally anchored, so a full rewrite of the database cannot be
-            detected. Publish a program's chain head to anchor it.
+            detected. Mirage does not publish or anchor chain heads.
           </p>
           <div className={`text-xs px-3 py-2 rounded-lg border mb-4 ${
             chain?.valid ? "border-good/40 text-good" : "border-bad/40 text-bad"

@@ -45,7 +45,7 @@ def run() -> dict:
             "score": v["score"],
             "label": v["label"],
         })
-        print(f"  best Sharpe {res['best_sharpe']:.2f}  DSR p {res['dsr']:.3f}  "
+        print(f"  best Sharpe {res['best_sharpe']:.2f}  DSR conf {res['dsr']:.3f}  "
               f"PBO {res['pbo']:.2f}  RC p {res['reality_check_p']:.2f} "
               f"-> {v['label']} ({v['score']})")
 

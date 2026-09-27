@@ -44,7 +44,7 @@ def psr(
     sr_benchmark: float = 0.0,
     periods_per_year: int = TRADING_DAYS,
 ) -> float:
-    """Probabilistic Sharpe Ratio: P(true SR > sr_benchmark).
+    """Probabilistic Sharpe Ratio: confidence that true SR > sr_benchmark.
 
     Returns a probability in [0, 1]. ``returns`` are per-period returns and
     ``sr_benchmark`` is an annualized Sharpe threshold.  The test statistic is

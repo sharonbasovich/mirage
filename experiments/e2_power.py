@@ -4,7 +4,7 @@ For each annualized-Sharpe skill level s, N-1 iid noise strategies plus one
 strategy with true daily drift giving Sharpe s.  A rep is POSITIVE when the
 in-sample winner is the genuinely skilled strategy; the detectors must then
 certify skill.  We report detection power vs skill and ROC/AUC for
-DSR p-value and 1-PBO as classifiers of 'the IS winner has true skill'.
+DSR confidence and 1-PBO as classifiers of 'the IS winner has true skill'.
 """
 
 from __future__ import annotations
@@ -74,7 +74,7 @@ def run(n_strategies: int = 50, n_days: int = 2500, reps: int = 40,
 
     f, ax, p = fig("e2_power.png")
     ax.plot([x["skill"] for x in power], [x["power_dsr"] for x in power],
-            "o-", color="#38bdf8", label="DSR p > 0.5")
+            "o-", color="#38bdf8", label="DSR confidence > 0.5")
     ax.plot([x["skill"] for x in power], [x["power_pbo"] for x in power],
             "s-", color="#fbbf24", label="PBO < 0.25")
     ax.plot([x["skill"] for x in power], [x["power_verdict"] for x in power],
@@ -109,7 +109,7 @@ def run(n_strategies: int = 50, n_days: int = 2500, reps: int = 40,
     print("label confusion:", json.dumps(confusion))
 
     f, ax, p = fig("e2_roc.png")
-    ax.plot(f_d, t_d, color="#38bdf8", lw=2, label=f"DSR p-value (AUC {auc_d:.3f})")
+    ax.plot(f_d, t_d, color="#38bdf8", lw=2, label=f"DSR confidence (AUC {auc_d:.3f})")
     ax.plot(f_p, t_p, color="#fbbf24", lw=2, label=f"1 - PBO (AUC {auc_p:.3f})")
     ax.plot([0, 1], [0, 1], ":", color="#6b7280", label="chance")
     ax.set_xlabel("false positive rate")

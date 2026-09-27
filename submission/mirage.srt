@@ -1,43 +1,43 @@
 1
-00:00:00,000 --> 00:00:15,000
-Anyone can build a trading strategy with a three-hundred-percent backtest. Almost none survive live. The reason isn't bad code — it's selection bias.
+00:00:00,000 --> 00:00:12,000
+Try fifty parameter combinations, keep the best one, and part of that winning backtest is luck. That is selection bias, and Mirage is built to measure it.
 
 2
-00:00:15,000 --> 00:00:40,000
-We ran one thousand random, zero-skill strategies on real S&P data. The best backtest looks great — a Sharpe of 0.61. It's pure luck, and the math knows it.
+00:00:12,000 --> 00:00:29,834
+Mirage backtests a whole strategy grid on historical data with transaction costs. The bundled data is the World Bank Pink Sheet: monthly commodity reference prices, licensed CC BY 4.0. These are hypothetical price-series backtests, not realizable trading profits.
 
 3
-00:00:40,000 --> 00:00:48,634
-Mirage backtests your strategy grid on historical data with realistic costs, and remembers every single trial.
+00:00:29,834 --> 00:00:44,134
+One click runs twelve moving-average crossover trials on gold. Every trial is appended to a hash-chained Trial Ledger, and the diagnostics use that full trial count: Deflated Sharpe Ratio, CSCV, and White's Reality Check.
 
 4
-00:00:48,634 --> 00:00:55,468
-Every trial lands in a hash-chained Trial Ledger, so the trial count can't quietly shrink inside the ledger. Then the overfitting battery runs: Deflated Sharpe Ratio, CSCV, Reality Check.
+00:00:44,134 --> 00:01:11,968
+The best trial has a Sharpe of 0.71, and a deflated Sharpe confidence of 1.00. That is an exceedance estimate over the best-of-twelve luck threshold, not the probability of genuine skill. Overfitting risk is low: PBO is 23 percent. But the Reality Check p-value against holding gold is 0.59, so there is insufficient evidence of outperformance. The verdict is capped at Unclear, with a score of 81.
 
 5
-00:00:55,468 --> 00:01:09,168
-This zoo runs on bundled, openly licensed World Bank gold prices. The overfitting risk is low, twenty-three percent, but the best trial does not beat simply holding gold beyond luck. Reality Check p is point five nine, so the verdict is capped at unclear.
+00:01:11,968 --> 00:01:26,435
+Each ledger entry hashes its timestamp, config, data hash, and the previous entry. That detects edits or deletions within an intact ledger. The chain is not signed or externally anchored, so the exported certificate is unsigned.
 
 6
-00:01:09,168 --> 00:01:17,002
-Every trial is hash-chained — timestamp, config hash, data hash. Export a certificate with the chain head, and publish it to anchor the record.
+00:01:26,435 --> 00:01:37,169
+Already using another backtester? Upload a returns CSV, here a set of synthetic strategies, with a declared trial count, and Mirage runs the same audit.
 
 7
-00:01:17,002 --> 00:01:25,636
-Already used another backtester? Upload your returns and a trial count — Mirage audits the field, not just its own runs.
+00:01:37,169 --> 00:01:48,803
+Every method comes from the academic literature, with formulas and citations on the methods page.
 
 8
-00:01:25,636 --> 00:01:36,803
-Every method is from the published literature — Deflated Sharpe Ratio, CSCV, White's Reality Check, purged cross-validation — with formulas and citations on the methods page.
+00:01:48,803 --> 00:02:06,470
+Does the detector work? In experiment E2 we plant known skill in one of fifty synthetic strategies. When the skilled strategy wins in-sample, the verdict says Survives 82.5 percent of the time at a true Sharpe of 1.5, and 97.5 percent at 2.0.
 
 9
-00:01:36,803 --> 00:01:58,803
-And Mirage validates itself — planted-skill experiments measure the detector's own ROC AUC at point nine, and the verdict label's own accuracy on ground truth.
+00:02:06,470 --> 00:02:27,437
+On pure-noise zoos, the label says Survives only 5 percent of the time, while a DSR confidence above 0.5 alone would flag 57.5 percent. Across 320 synthetic zoos the label is right 82 percent of the time. ROC AUC is 0.91 for DSR and 0.90 for PBO.
 
 10
-00:01:58,803 --> 00:02:18,803
-DSR alone misses forty-five percent of zero-skill zoos — the combined battery misses none. The verdict is a battery, not a number.
+00:02:27,437 --> 00:02:50,304
+Experiment E4 runs four hypothetical zoos on the bundled World Bank prices: gold crossover, Brent momentum, commodity momentum, and gold RSI. None shows sufficient evidence of beating its benchmark after data snooping, so all four are Unclear, with scores from 52 to 87. Futures roll, storage, and financing are not modeled.
 
 11
-00:02:18,803 --> 00:02:30,803
-Mirage — free, open source, MIT licensed. Stop trusting your own backtests.
+00:02:50,304 --> 00:03:03,471
+Mirage is free, open source, and MIT licensed. Data: World Bank Pink Sheet, CC BY 4.0. It is a historical-simulation research prototype, not financial advice.

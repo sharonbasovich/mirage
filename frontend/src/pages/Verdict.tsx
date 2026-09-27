@@ -133,8 +133,8 @@ export default function Verdict() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Best IS Sharpe" value={a.best_sharpe.toFixed(2)}
           hint={`PSR (vs 0) = ${pct(a.psr)}`} />
-        <Stat label="DSR p-value" value={pct(a.dsr)}
-          hint={`E[max Sharpe | luck] = ${a.dsr_threshold.toFixed(2)}`} />
+        <Stat label="DSR confidence" value={pct(a.dsr)}
+          hint={`exceedance vs E[max Sharpe | luck] = ${a.dsr_threshold.toFixed(2)}; not P(skill)`} />
         <Stat label="PBO (CSCV)" value={pct(a.pbo)}
           hint={`${a.n_combinations.toLocaleString()} splits`} />
         <Stat label="P(OOS loss)" value={pct(a.p_oos_loss)}

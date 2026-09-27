@@ -63,11 +63,14 @@ def title_card(path: Path, big: str, small: list[str]):
     plt.close(fig)
 
 
+FIG_H = 800  # keep figures above the burned-in subtitle band
+
+
 def still_clip(png: Path, mp4: Path, secs: float):
     subprocess.run(
         ["ffmpeg", "-y", "-loop", "1", "-t", f"{secs}", "-i", str(png),
-         "-vf", f"scale={W}:{H}:force_original_aspect_ratio=decrease,"
-                f"pad={W}:{H}:(ow-iw)/2:(oh-ih)/2:color=0x0b1020,format=yuv420p",
+         "-vf", f"scale={W}:{FIG_H}:force_original_aspect_ratio=decrease,"
+                f"pad={W}:{H}:(ow-iw)/2:({FIG_H}-ih)/2+20:color=0x0b1020,format=yuv420p",
          "-r", "30", "-c:v", "libx264", "-preset", "fast", str(mp4)],
         check=True, capture_output=True)
 
@@ -82,14 +85,18 @@ def main():
     SEGS.mkdir(parents=True, exist_ok=True)
     tc = SEGS / "title_card.png"
     ec = SEGS / "end_card.png"
-    title_card(tc, "MIRAGE", ["the backtest lie detector", "GIBC V2 · Track 02"])
+    title_card(tc, "MIRAGE", ["the backtest lie detector", "GIBC V2 · Track 02",
+                              "data: World Bank Pink Sheet (CC BY 4.0) + synthetic series"])
     title_card(ec, "MIRAGE", ["github.com/sharonbasovich/mirage",
-                              "research prototype · not financial advice"])
-    still_clip(tc, SEGS / "01_title.mp4", 15)
-    still_clip(FIGS / "e1_sharpe_histogram.png", SEGS / "02_e1fig.mp4", 25)
-    still_clip(FIGS / "e2_roc.png", SEGS / "08_e2fig.mp4", 22)
-    still_clip(FIGS / "e3_scorecard.png", SEGS / "09_e3fig.mp4", 20)
-    still_clip(ec, SEGS / "10_end.mp4", 12)
+                              "data: World Bank Commodity Price Data (The Pink Sheet), CC BY 4.0",
+                              "historical simulation only · research prototype · not financial advice"])
+    for old in ("02_e1fig.mp4", "09_e3fig.mp4"):
+        (SEGS / old).unlink(missing_ok=True)
+    still_clip(tc, SEGS / "01_title.mp4", 12)
+    still_clip(FIGS / "e2_power.png", SEGS / "08_e2power.mp4", 16)
+    still_clip(FIGS / "e2_roc.png", SEGS / "085_e2roc.mp4", 16)
+    still_clip(FIGS / "e4_worldbank_scorecard.png", SEGS / "09_e4fig.mp4", 14)
+    still_clip(ec, SEGS / "10_end.mp4", 10)
 
     # normalize recorded webm -> mp4 uniform
     for w in SEGS.glob("0*_*.webm"):
@@ -100,22 +107,37 @@ def main():
              "-r", "30", "-c:v", "libx264", "-preset", "fast", str(out)],
             check=True, capture_output=True)
 
-    order = ["01_title.mp4", "02_e1fig.mp4", "03_lab.mp4", "04_run.mp4",
-             "05_verdict.mp4", "06_ledger.mp4", "07_upload.mp4", "075_about.mp4",
-             "08_e2fig.mp4", "09_e3fig.mp4", "10_end.mp4"]
+    order = ["01_title.mp4", "03_lab.mp4", "04_run.mp4", "05_verdict.mp4",
+             "06_ledger.mp4", "07_upload.mp4", "075_about.mp4",
+             "08_e2power.mp4", "085_e2roc.mp4", "09_e4fig.mp4", "10_end.mp4"]
     subs = {
-        "01_title.mp4": "Anyone can build a trading strategy with a three-hundred-percent backtest. Almost none survive live. The reason isn't bad code — it's selection bias.",
-        "02_e1fig.mp4": "We ran one thousand random, zero-skill strategies on real S&P data. The best backtest looks great — a Sharpe of 0.61. It's pure luck, and the math knows it.",
-        "03_lab.mp4": "Mirage backtests your strategy grid on historical data with realistic costs, and remembers every single trial.",
-        "04_run.mp4": "Every trial lands in a hash-chained Trial Ledger, so the trial count can't quietly shrink inside the ledger. Then the overfitting battery runs: Deflated Sharpe Ratio, CSCV, Reality Check.",
-        "05_verdict.mp4": "This zoo runs on bundled, openly licensed World Bank gold prices. The overfitting risk is low, twenty-three percent, but the best trial does not beat simply holding gold beyond luck. Reality Check p is point five nine, so the verdict is capped at unclear.",
-        "06_ledger.mp4": "Every trial is hash-chained — timestamp, config hash, data hash. Export a certificate with the chain head, and publish it to anchor the record.",
-        "07_upload.mp4": "Already used another backtester? Upload your returns and a trial count — Mirage audits the field, not just its own runs.",
-        "075_about.mp4": "Every method is from the published literature — Deflated Sharpe Ratio, CSCV, White's Reality Check, purged cross-validation — with formulas and citations on the methods page.",
-        "08_e2fig.mp4": "And Mirage validates itself — planted-skill experiments measure the detector's own ROC AUC at point nine, and the verdict label's own accuracy on ground truth.",
-        "09_e3fig.mp4": "DSR alone misses forty-five percent of zero-skill zoos — the combined battery misses none. The verdict is a battery, not a number.",
-        "10_end.mp4": "Mirage — free, open source, MIT licensed. Stop trusting your own backtests.",
+        "01_title.mp4": "Try fifty parameter combinations, keep the best one, and part of that winning backtest is luck. That is selection bias, and Mirage is built to measure it.",
+        "03_lab.mp4": "Mirage backtests a whole strategy grid on historical data with transaction costs. The bundled data is the World Bank Pink Sheet: monthly commodity reference prices, licensed CC BY 4.0. These are hypothetical price-series backtests, not realizable trading profits.",
+        "04_run.mp4": "One click runs twelve moving-average crossover trials on gold. Every trial is appended to a hash-chained Trial Ledger, and the diagnostics use that full trial count: Deflated Sharpe Ratio, CSCV, and White's Reality Check.",
+        "05_verdict.mp4": "The best trial has a Sharpe of 0.71, and a deflated Sharpe confidence of 1.00. That is an exceedance estimate over the best-of-twelve luck threshold, not the probability of genuine skill. Overfitting risk is low: PBO is 23 percent. But the Reality Check p-value against holding gold is 0.59, so there is insufficient evidence of outperformance. The verdict is capped at Unclear, with a score of 81.",
+        "06_ledger.mp4": "Each ledger entry hashes its timestamp, config, data hash, and the previous entry. That detects edits or deletions within an intact ledger. The chain is not signed or externally anchored, so the exported certificate is unsigned.",
+        "07_upload.mp4": "Already using another backtester? Upload a returns CSV, here a set of synthetic strategies, with a declared trial count, and Mirage runs the same audit.",
+        "075_about.mp4": "Every method comes from the academic literature, with formulas and citations on the methods page.",
+        "08_e2power.mp4": "Does the detector work? In experiment E2 we plant known skill in one of fifty synthetic strategies. When the skilled strategy wins in-sample, the verdict says Survives 82.5 percent of the time at a true Sharpe of 1.5, and 97.5 percent at 2.0.",
+        "085_e2roc.mp4": "On pure-noise zoos, the label says Survives only 5 percent of the time, while a DSR confidence above 0.5 alone would flag 57.5 percent. Across 320 synthetic zoos the label is right 82 percent of the time. ROC AUC is 0.91 for DSR and 0.90 for PBO.",
+        "09_e4fig.mp4": "Experiment E4 runs four hypothetical zoos on the bundled World Bank prices: gold crossover, Brent momentum, commodity momentum, and gold RSI. None shows sufficient evidence of beating its benchmark after data snooping, so all four are Unclear, with scores from 52 to 87. Futures roll, storage, and financing are not modeled.",
+        "10_end.mp4": "Mirage is free, open source, and MIT licensed. Data: World Bank Pink Sheet, CC BY 4.0. It is a historical-simulation research prototype, not financial advice.",
     }
+
+    # synthesize narration first; extend any segment that is shorter than its line
+    narr: dict[str, float] = {}
+    for i, name in enumerate(order, 1):
+        narr[name] = tts(subs[name], SEGS / f"narr_{i}.wav")
+        need = narr[name] + 0.8
+        have = ffprobe_dur(SEGS / name)
+        if need > have:
+            tmp = SEGS / f"pad_{name}"
+            subprocess.run(
+                ["ffmpeg", "-y", "-i", str(SEGS / name),
+                 "-vf", f"tpad=stop_mode=clone:stop_duration={need - have:.2f}",
+                 "-r", "30", "-c:v", "libx264", "-preset", "fast", str(tmp)],
+                check=True, capture_output=True)
+            tmp.replace(SEGS / name)
 
     durs = {}
     t = 0.0
@@ -136,14 +158,11 @@ def main():
     narr_inputs: list[str] = []
     narr_filter: list[str] = []
     mix_names: list[str] = []
-    for i, start, end, text in cues:
+    for i, start, _end, _text in cues:
         wav = SEGS / f"narr_{i}.wav"
-        dur = tts(text, wav)
-        if dur <= 0:
+        if narr[order[i - 1]] <= 0:
             continue
-        slot = end - start
-        tempo = dur / slot if dur > slot else 1.0
-        tempo = min(tempo, 1.6)
+        tempo = 1.0
         narr_inputs += ["-i", str(wav)]
         ms = int(start * 1000)
         narr_filter.append(

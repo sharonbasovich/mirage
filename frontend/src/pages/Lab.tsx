@@ -77,7 +77,9 @@ export default function Lab() {
             Pick a strategy family, a universe, and a parameter grid. Every trial
             is appended to the hash-chained Trial Ledger, and Mirage counts every
             one when judging your "best" result. Bundled data: World Bank Pink
-            Sheet monthly commodity prices (CC BY 4.0). Daily Yahoo symbols
+            Sheet monthly reference prices (CC BY 4.0); results are hypothetical
+            price-series backtests, not realizable P&amp;L (no futures roll,
+            storage or financing). Daily Yahoo symbols
             appear only if you fetched them locally.
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
