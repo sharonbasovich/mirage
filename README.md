@@ -30,6 +30,7 @@ and detection power, and publish ROC curves.
 ## Demo
 
 - **Live app:** see `submission/DEVPOST.md` for the deployed URL
+- **Source:** https://github.com/sharonbasovich/mirage
 - **Screenshots:** `submission/screenshots/`
 - **Experiment figures:** `reports/figures/`
 

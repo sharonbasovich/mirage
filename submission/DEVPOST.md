@@ -118,7 +118,7 @@ confident number.
 ## Try it out
 
 - **Live app:** [DEPLOYED URL — paste here]
-- **Source:** [GITHUB URL — https://github.com/sharonbasovich/mirage]
+- **Source:** https://github.com/sharonbasovich/mirage
 - **Demo video:** [YOUTUBE URL — human uploads; script in submission/VIDEO_SCRIPT.md]
 
 ## Built With

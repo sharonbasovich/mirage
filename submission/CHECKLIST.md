@@ -16,7 +16,7 @@
 ## Human TODO before submit
 
 - [ ] Create public GitHub repo `sharonbasovich/mirage` and push (or untar `mirage-source.tar.gz`)
-- [ ] Approve the Fly.io deploy in the Devin session
+- [ ] Approve the Devin deploy (built-in, free) in the Devin session
 - [ ] Paste deployed URL + repo URL into DEVPOST.md "Try it out"
 - [ ] Upload `mirage_demo.mp4` to YouTube (unlisted ok), paste link into Devpost
 - [ ] Fill Terry's name/handle if applicable
@@ -39,7 +39,7 @@
 ## Human TODO before submit
 
 - [ ] Create public GitHub repo `sharonbasovich/mirage` and push (or untar `mirage-source.tar.gz`)
-- [ ] Approve the Fly.io deploy in the Devin session
+- [ ] Approve the Devin deploy (built-in, free) in the Devin session
 - [ ] Paste deployed URL + repo URL into DEVPOST.md "Try it out"
 - [ ] Upload `mirage_demo.mp4` to YouTube (unlisted ok), paste link into Devpost
 - [ ] Fill Terry's name/handle if applicable
