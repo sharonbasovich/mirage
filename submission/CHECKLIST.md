@@ -9,7 +9,7 @@
 | Built With tag list | `submission/DEVPOST.md` → "Built With" | done |
 | Hosted demo video, 2–5 min | `submission/mirage_demo.mp4` (3:03, 1920×1080, h264 + AAC narration, burned English subtitles) | file done; **YouTube upload pending (human)** |
 | ≥ 3 screenshots | `submission/screenshots/` (9 UI PNGs) + `reports/figures/` | done |
-| Public repo | https://github.com/sharonbasovich/mirage (public, exists) | `main` and [`codex/gibc-worldbank-audit`](https://github.com/sharonbasovich/mirage/tree/codex/gibc-worldbank-audit) at `5a75fcf`; E2/E4 result JSON committed |
+| Public repo | https://github.com/sharonbasovich/mirage (public, exists) | `main` and [`codex/gibc-worldbank-audit`](https://github.com/sharonbasovich/mirage/tree/codex/gibc-worldbank-audit) include the audited source and committed E2/E4 result JSON |
 | Live/deployed project | Optional public demo; rules require a working prototype and hosted video | Devin built-in deploy approval pending; no live URL yet |
 
 ## Human TODO before submit

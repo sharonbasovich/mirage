@@ -2,7 +2,8 @@
 
 ## Status (2026-09-27)
 - Public repo https://github.com/sharonbasovich/mirage: `main` and the
-  review branch `codex/gibc-worldbank-audit` are at `5a75fcf`. The Devin
+  review branch `codex/gibc-worldbank-audit` include the audited source and
+  reproducible result files through `5a75fcf`. The Devin
   hardening and submission-audit commits were imported from verified Git
   bundles and pushed after independent QA.
 - Tests: 54 passing (33 core + 21 API abuse regressions); ruff, mypy, tsc clean.
