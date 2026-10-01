@@ -30,7 +30,7 @@ data = ["yfinance==0.2.66", "openpyxl==3.1.5"]
 mirage = "mirage.cli:app"
 
 [tool.setuptools.packages.find]
-include = ["mirage*"]
+include = ["mirage*", "app*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
