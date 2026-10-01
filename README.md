@@ -30,6 +30,8 @@ and detection power, and report ROC curves.
 
 ## Demo
 
+- **Devpost:** https://devpost.com/software/mirage-1vh78d (submitted, GIBC V2 Track 02)
+- **Demo video:** https://www.youtube.com/watch?v=Q3b8egv8syM (3:03, narrated)
 - **Live app:** not deployed yet (the free Devin backend deploy is waiting for approval)
 - **Source:** https://github.com/sharonbasovich/mirage
 - **Screenshots:** `submission/screenshots/`

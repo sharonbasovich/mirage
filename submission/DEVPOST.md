@@ -152,7 +152,7 @@ detector's own error rates belong next to its verdicts.
 - **Run locally:** follow the setup and launch steps in the README; this is a
   historical-simulation research prototype.
 - **Source:** https://github.com/sharonbasovich/mirage
-- **Demo video:** [YOUTUBE URL — human uploads; script in submission/VIDEO_SCRIPT.md]
+- **Demo video:** https://www.youtube.com/watch?v=Q3b8egv8syM (script in submission/VIDEO_SCRIPT.md)
 
 ## Built With
 

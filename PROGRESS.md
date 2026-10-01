@@ -1,6 +1,6 @@
 # PROGRESS
 
-## Status (2026-09-27)
+## Status (2026-10-01)
 - Public repo https://github.com/sharonbasovich/mirage: `main` and the
   review branch `codex/gibc-worldbank-audit` include the audited source and
   reproducible result files through `5a75fcf`. The Devin
@@ -9,7 +9,8 @@
 - Tests: 54 passing (33 core + 21 API abuse regressions); ruff, mypy, tsc clean.
 - Deploy: Devin built-in backend deploy (free) is **pending approval**. No live
   URL yet.
-- Devpost: **not submitted**. YouTube upload is still pending (human).
+- Devpost: **submitted and live** — https://devpost.com/software/mirage-1vh78d
+- Demo video: hosted at https://www.youtube.com/watch?v=Q3b8egv8syM
 
 ## Done
 - Diagnostics (PSR/DSR/MinTRL per-period units, CSCV/PBO, purged CV, Reality
@@ -34,6 +35,6 @@
 - [ ] Optional: approve deploy, smoke-test, and insert the URL if a live demo
   would help judges; the rules require a running prototype and hosted video,
   not a public live-app URL
-- [ ] Host the 3:03 demo on YouTube, Vimeo, or Youku (unlisted is permitted)
-- [ ] Complete and finally submit the Devpost entry before the deadline
+- [x] Host the 3:03 demo on YouTube — https://www.youtube.com/watch?v=Q3b8egv8syM
+- [x] Submit the Devpost entry — https://devpost.com/software/mirage-1vh78d
 - [ ] Optional: purge the old Yahoo CSVs from git history (history rewrite + force push; human decision)

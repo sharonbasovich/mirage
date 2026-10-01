@@ -7,17 +7,18 @@
 | Project name, tagline ≤ 60 chars | Mirage — "The backtest lie detector." (26) | done |
 | Full description (Inspiration … What's next) | `submission/DEVPOST.md` | done |
 | Built With tag list | `submission/DEVPOST.md` → "Built With" | done |
-| Hosted demo video, 2–5 min | `submission/mirage_demo.mp4` (3:03, 1920×1080, h264 + AAC narration, burned English subtitles) | file done; **YouTube upload pending (human)** |
+| Hosted demo video, 2–5 min | `submission/mirage_demo.mp4` (3:03, 1920×1080, h264 + AAC narration, burned English subtitles) | hosted: https://www.youtube.com/watch?v=Q3b8egv8syM |
 | ≥ 3 screenshots | `submission/screenshots/` (9 UI PNGs) + `reports/figures/` | done |
 | Public repo | https://github.com/sharonbasovich/mirage (public, exists) | `main` and [`codex/gibc-worldbank-audit`](https://github.com/sharonbasovich/mirage/tree/codex/gibc-worldbank-audit) include the audited source and committed E2/E4 result JSON |
 | Live/deployed project | Optional public demo; rules require a working prototype and hosted video | Devin built-in deploy approval pending; no live URL yet |
+| Devpost entry | https://devpost.com/software/mirage-1vh78d | submitted |
 
 ## Human TODO before submit
 
 - [x] Push the audited source and reproducible E2/E4 results to `main`
 - [ ] Optional: approve the Devin deploy, smoke-test it, and add its URL
-- [ ] Upload `mirage_demo.mp4` to YouTube, Vimeo, or Youku (unlisted ok), paste link into Devpost
-- [ ] Submit on Devpost before **Oct 1 2026, 15:45 UTC** (not yet submitted)
+- [x] Upload `mirage_demo.mp4` to YouTube — https://www.youtube.com/watch?v=Q3b8egv8syM
+- [x] Submit on Devpost — https://devpost.com/software/mirage-1vh78d (submitted before the Oct 1 2026, 15:45 UTC conservative deadline)
 
 ## Track 02 rules / constraints
 
