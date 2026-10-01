@@ -24,7 +24,6 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 import pandas as pd
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,6 +32,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
+from mirage.audit import AuditInputError, prepare_audit_frame
 from mirage.data import (
     data_hash,
     frequency,
@@ -42,7 +42,6 @@ from mirage.data import (
     load_ohlcv,
     source_info,
 )
-from mirage.diagnostics.sharpe import dsr_expected_max_sharpe, psr, sharpe_ratio
 from mirage.ledger import PROGRAM_ID_RE, Ledger, state_dir
 from mirage.program import analyze_returns_matrix, analyze_trials, run_program
 from mirage.strategies import STRATEGIES
@@ -502,45 +501,30 @@ async def audit(
             raise HTTPException(413, f"more than {MAX_AUDIT_ROWS} rows")
         if df.shape[1] > MAX_AUDIT_COLUMNS + 1:
             raise HTTPException(413, f"more than {MAX_AUDIT_COLUMNS} return columns")
-        for c in df.columns:
-            if str(c).lower() in ("date", "timestamp", "time"):
-                df = df.drop(columns=[c])
-                break
-        df = df.select_dtypes(include=[np.number]).dropna(how="all").fillna(0.0)
-        if df.shape[1] > MAX_AUDIT_COLUMNS:
+        try:
+            prep = prepare_audit_frame(
+                df, declared_trials=n_trials, frequency=frequency_,
+                benchmark=benchmark,
+            )
+        except AuditInputError as exc:
+            raise HTTPException(400, str(exc)) from exc
+        if prep.returns.shape[1] > MAX_AUDIT_COLUMNS:
             raise HTTPException(413, f"more than {MAX_AUDIT_COLUMNS} return columns")
-        if df.shape[1] < 1 or len(df) < 64:
-            raise HTTPException(400, "need numeric returns columns with >= 64 rows")
-        if not np.isfinite(df.to_numpy()).all():
-            raise HTTPException(400, "returns must be finite numbers")
-        df.index = pd.RangeIndex(len(df))
         ppy = 12 if frequency_ == "monthly" else 252
 
-        bench = None
-        if benchmark:
-            if not is_available(benchmark) or source_info(benchmark)["frequency"] != frequency_:
-                raise HTTPException(400, "benchmark unavailable for this frequency")
-            b = load_close(benchmark).pct_change().fillna(0.0)
-            if len(b) >= len(df):
-                bench = pd.Series(b.iloc[-len(df):].to_numpy(), index=df.index)
-
         try:
-            analysis = analyze_returns_matrix(df, benchmark_returns=bench,
-                                              assumed_cost_bps=cost_bps,
-                                              periods_per_year=ppy)
+            analysis = analyze_returns_matrix(
+                prep.returns, benchmark_returns=prep.benchmark,
+                assumed_cost_bps=cost_bps, periods_per_year=ppy,
+                declared_trials=n_trials,
+            )
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
         except Exception as exc:  # noqa: BLE001
             log.exception("audit failed")
             raise HTTPException(500, "audit failed") from exc
-        # rescale DSR to the *declared* trial count (the whole point of auditing)
-        if n_trials > df.shape[1]:
-            sharpes = np.array([sharpe_ratio(df[c].to_numpy(), ppy) for c in df.columns])
-            best_col = analysis["best_label"]
-            thr = dsr_expected_max_sharpe(sharpes, n_trials=n_trials)
-            analysis["dsr"] = psr(df[best_col].to_numpy(), sr_benchmark=thr,
-                                  periods_per_year=ppy)
-            analysis["dsr_threshold"] = thr
-            analysis["n_trials"] = int(n_trials)
-        analysis["declared_trials"] = int(n_trials)
+        if prep.benchmark_dropped:
+            analysis["benchmark_dropped_rows"] = prep.benchmark_dropped
     return {"program_id": "audit", "analysis": analysis}
 
 

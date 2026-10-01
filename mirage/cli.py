@@ -5,10 +5,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import typer
 
+from mirage.audit import AuditInputError, prepare_audit_frame
 from mirage.ledger import Ledger
 from mirage.program import analyze_returns_matrix, analyze_trials, run_program
 from mirage.strategies import STRATEGIES
@@ -67,42 +67,47 @@ def run(
 
 @app.command()
 def audit(
-    csv: Path = typer.Argument(..., help="CSV of daily returns; one column per trial"),
+    csv: Path = typer.Argument(..., help="CSV of returns; one column per trial"),
     trials: int = typer.Option(..., "--trials", "-n", help="declared total trials tried"),
     benchmark: str | None = typer.Option(None, help="symbol to use as benchmark"),
-    date_col: str = typer.Option("Date"),
+    date_col: str = typer.Option("Date", help="date column for benchmark alignment"),
+    frequency: str = typer.Option("daily", help="return frequency: daily|monthly"),
+    cost_bps: float = typer.Option(5.0, help="assumed transaction cost, basis points"),
 ):
     """Audit an external backtest: upload returns + declared trial count."""
-    df = pd.read_csv(csv)
-    if date_col in df.columns:
-        df[date_col] = pd.to_datetime(df[date_col])
-        df = df.set_index(date_col)
-    df = df.select_dtypes(include=[np.number]).dropna(how="all").fillna(0.0)
-    if df.shape[1] < 2:
-        typer.echo("need at least 2 numeric columns (trials)", err=True)
-        raise typer.Exit(1)
-
-    # honor the declared total trial count even if only the best is uploaded:
-    # if columns < declared, replicate padded noise columns are NOT used —
-    # instead we pass n_trials to DSR via trial_sharpes length check below.
-    res = analyze_returns_matrix(df)
-    if trials > df.shape[1]:
-        # rescale the DSR threshold to the *declared* number of trials
-        from mirage.diagnostics.sharpe import dsr_expected_max_sharpe, psr, sharpe_ratio
-
-        sharpes = np.array([sharpe_ratio(df[c].to_numpy()) for c in df.columns])
-        best_col = res["best_label"]
-        thr = dsr_expected_max_sharpe(sharpes, n_trials=trials)
-        res["dsr"] = psr(df[best_col].to_numpy(), sr_benchmark=thr)
-        res["dsr_threshold"] = thr
-        res["n_trials"] = trials
-    typer.echo(json.dumps({
+    try:
+        raw = pd.read_csv(csv)
+    except Exception as exc:  # noqa: BLE001
+        typer.echo(f"could not parse CSV: {exc}", err=True)
+        raise typer.Exit(1) from exc
+    try:
+        prep = prepare_audit_frame(
+            raw, declared_trials=trials, frequency=frequency,
+            date_col=date_col, benchmark=benchmark,
+        )
+    except AuditInputError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(1) from exc
+    ppy = 12 if frequency == "monthly" else 252
+    try:
+        res = analyze_returns_matrix(
+            prep.returns, benchmark_returns=prep.benchmark,
+            assumed_cost_bps=cost_bps, periods_per_year=ppy,
+            declared_trials=trials,
+        )
+    except ValueError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(1) from exc
+    out = {
         "best": res["best_label"], "sharpe": res["best_sharpe"],
         "psr": res["psr"], "dsr": res["dsr"], "pbo": res["pbo"],
         "reality_check_p": res["reality_check_p"],
+        "n_trials": res["n_trials"], "observed_trials": res["observed_trials"],
+        "benchmark_dropped_rows": prep.benchmark_dropped,
         "score": res["verdict"]["score"], "verdict": res["verdict"]["label"],
         "narrative": res["verdict"]["narrative"],
-    }, indent=2))
+    }
+    typer.echo(json.dumps(out, indent=2))
 
 
 @app.command()

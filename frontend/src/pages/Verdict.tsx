@@ -76,8 +76,12 @@ export default function Verdict() {
         <h1 className="text-xl font-bold">Autopsy report</h1>
         <span className="text-xs text-dim font-mono">{programId}</span>
         <span className="text-xs text-dim">
-          {a.n_trials} recorded trials · {a.n_days} {unit}
-          {a.declared_trials ? ` · ${a.declared_trials} declared` : ""}
+          {a.declared_trials != null &&
+          a.observed_trials != null &&
+          a.declared_trials > a.observed_trials
+            ? `${a.observed_trials} uploaded trial columns · ${a.declared_trials} declared trials`
+            : `${a.n_trials} recorded trials`}{" "}
+          · {a.n_days} {unit}
         </span>
       </div>
 

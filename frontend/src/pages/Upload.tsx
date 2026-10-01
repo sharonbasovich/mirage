@@ -136,9 +136,11 @@ export default function Upload() {
       <div className="card text-xs text-dim leading-relaxed">
         <span className="text-gray-300 font-semibold">Honesty note.</span> Mirage
         cannot verify the declared trial count for external uploads — the
-        Deflated Sharpe Ratio rescales to whatever number you report. That is
-        exactly why the Trial Ledger exists: inside Mirage, the count is the
-        ledger's, not yours.
+        Deflated Sharpe Ratio rescales to whatever number you report. If you
+        upload fewer columns than you declare, the luck threshold is
+        extrapolated from the uploaded subset — trials you didn't upload were
+        not seen. That is exactly why the Trial Ledger exists: inside Mirage,
+        the count is the ledger's, not yours.
       </div>
     </div>
   );

@@ -64,6 +64,8 @@ def build_verdict(
     rc_p: float | None = None,
     breakeven_capped: bool = False,
     period_unit: str = "days",
+    trial_count_label: str = "recorded",
+    observed_trials: int | None = None,
 ) -> Verdict:
     comps: list[Component] = []
     narrative: list[str] = []
@@ -74,15 +76,23 @@ def build_verdict(
                            f"the best-of-{n_trials} luck threshold; not P(skill))"))
     if dsr_p < 0.10:
         narrative.append(
-            f"After deflating for {n_trials} recorded trials, the DSR confidence "
-            f"that the best Sharpe exceeds what luck alone would produce is only "
-            f"{dsr_p:.2f}."
+            f"After deflating for {n_trials} {trial_count_label} trials, the DSR "
+            f"confidence that the best Sharpe exceeds what luck alone would "
+            f"produce is only {dsr_p:.2f}."
         )
     elif dsr_p > 0.50:
         narrative.append(
             f"The Deflated Sharpe confidence is {dsr_p:.2f}: the best Sharpe exceeds "
             f"the expected best-of-{n_trials} luck threshold. This is a model-based "
             f"exceedance estimate, not the probability that genuine skill exists."
+        )
+    if observed_trials is not None and observed_trials < n_trials:
+        narrative.append(
+            f"The declared trial count ({n_trials}) exceeds the {observed_trials} "
+            "uploaded return series: the luck threshold is extrapolated from the "
+            "uploaded columns, assuming they are representative of the full "
+            "search distribution (independent trials, comparable Sharpe "
+            "variance). Trials that were not uploaded were not seen."
         )
 
     s_pbo = _clip(100 * (1 - pbo))

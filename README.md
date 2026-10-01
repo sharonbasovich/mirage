@@ -48,7 +48,7 @@ Prerequisites: Python ≥ 3.11, Node ≥ 20 (only for the web UI), ~2 GB disk.
 git clone https://github.com/sharonbasovich/mirage.git && cd mirage
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"          # core lib, CLI, API, dev tools
-pytest                            # 54 tests, offline (bundled World Bank data + synthetic)
+pytest                            # 77 tests, offline (bundled World Bank data + synthetic)
 ```
 
 Run the full web app (serves the built frontend from FastAPI, single origin):
@@ -72,6 +72,7 @@ docker compose up --build
 mirage run ma_cross --symbols WB_GOLD --grid "fast=2,3,6;slow=12,24"   # bundled monthly data
 mirage run ma_cross --symbols SPY --grid "fast=5,10,20;slow=100,200"   # after fetching Yahoo data
 mirage audit my_returns.csv --trials 40      # audit an external backtester's output
+mirage audit monthly.csv --trials 40 --frequency monthly --benchmark WB_GOLD
 mirage report <program-id>                   # unsigned trial-ledger certificate JSON
 mirage programs                              # list recorded programs
 mirage experiments                           # rerun E2 + E4 (E1/E3 only with a local Yahoo cache)
@@ -94,6 +95,32 @@ later, a user would have to record its chain head somewhere they don't
 control (a git commit, a post); Mirage does not do this, and no chain head
 from the demo has been published. The idea is borrowed from clinical
 pre-registration, but Mirage doesn't enforce it on its own.
+
+### Audit uploads
+
+`mirage audit` (and `POST /api/audit`) expects **one column of decimal simple
+returns per tried configuration** (0.01 = +1%); a `date`/`timestamp`/`time`
+column is optional. Inputs are validated before any diagnostic runs and
+refused with an explicit error — never silently filled or guessed at — when
+they contain missing, blank, non-finite or non-numeric cells, all-constant
+columns, values |r| ≥ 1 (percent units or price levels, not decimal
+returns), fewer than 64 rows, fewer than 2 return columns, or a declared
+trial count below the uploaded column count. Percent strings like `1%` are
+rejected; not every mistaken unit is detectable, so check the file's units
+before uploading. A declared count above the uploaded columns extrapolates
+the luck threshold from the uploaded columns — the verdict narrative
+says so and notes unseen trials were not seen — and is refused when the
+uploaded Sharpes are near-identical (the cross-trial variance needed for
+the extrapolation is then unestimable). When dates are present, the declared
+`frequency` is checked against the actual date spacing (a monthly file
+labelled daily is refused).
+
+An optional `benchmark` is inner-joined on the uploaded dates
+(month-aligned for monthly series) — never aligned by position. It requires
+a usable date column, ≥ 64 overlapping periods that are consecutive in the
+benchmark calendar, and a matching frequency; uploaded rows outside the
+benchmark's coverage are dropped and the count is reported. If any of that
+fails the audit is refused rather than silently omitting the benchmark.
 
 ### Public API limits
 
@@ -164,6 +191,13 @@ Gold trend-following and Brent momentum pass DSR and PBO, but the Reality
 Check finds insufficient evidence that either outperforms holding the asset
 after data snooping (RC p > 0.5), so Mirage won't call either one Survives.
 
+One caveat on that cap: the RC p is a bootstrap estimate, so it moves with
+the resampling seed, and Brent's sits near the 0.5 cutoff — across 40 seeds
+it ranged 0.470–0.572 and the label flipped between Survives and Unclear 19
+times (gold's did not flip once). The 0.5 threshold is a heuristic, not a
+calibrated significance level; a borderline RC p should be read as genuinely
+undecided, and rerunning can nudge Brent across the line.
+
 **Optional local experiments (outside the submission).** E1 (random zero-skill
 zoos) and E3 (daily ETF/crypto report cards) run only on daily Yahoo data a
 user fetches into their own cache. That data is not bundled, not
@@ -202,7 +236,7 @@ mirage/                 core package
   cli.py                `mirage` CLI (typer)
 experiments/            E1-E4 self-validation (seeded, -> reports/)
 frontend/               React + Vite + TS + Tailwind + Recharts
-tests/                  pytest suite (54 tests, incl. API abuse regressions)
+tests/                  pytest suite (77 tests, incl. API abuse regressions)
 data/worldbank/         bundled World Bank Pink Sheet subset (CC BY 4.0)
 scripts/fetch_data.py   user-local Yahoo fetch (not redistributed)
 scripts/fetch_worldbank.py  rebuilds the World Bank subset from the official workbook
@@ -229,9 +263,11 @@ repo.
 ## AI assistance disclosure
 
 Substantially all code, documentation, and the demo video script in this
-repository were drafted with **Devin (Cognition AI)** under human direction:
-the human defined the scope, reviewed the output, and directed testing.
-Statistical methods follow the cited academic sources.
+repository were implemented and reviewed by AI agents (**Devin, Cognition
+AI**) under the owner's authorization and direction: the owner defined the
+scope and requirements and authorized the work, while design,
+implementation, review and testing were AI-led. Statistical methods follow
+the cited academic sources.
 
 ## Team
 

@@ -30,6 +30,6 @@
 | AI disclosure | README + DEVPOST "AI assistance disclosure"; "Devin" in Built With |
 | English everything | all docs/code/video |
 | Team credit | Sharon Basovich (solo) in README "Team" and LICENSE |
-| Rigor & validation | Submitted evidence: E2 synthetic power/ROC + label confusion matrix and E4 World Bank report cards (hypothetical price-series backtests; DSR shown as a confidence estimate, not a p-value). Optional local E1/E3 (Yahoo) are outside the submission; 54 tests incl. PBO≈0.5-on-noise, PSR/MinTRL units, no-lookahead, ledger tamper, API abuse regressions |
+| Rigor & validation | Submitted evidence: E2 synthetic power/ROC + label confusion matrix and E4 World Bank report cards (hypothetical price-series backtests; DSR shown as a confidence estimate, not a p-value). Optional local E1/E3 (Yahoo) are outside the submission; 77 tests incl. PBO≈0.5-on-noise, PSR/MinTRL units, no-lookahead, ledger tamper, API abuse regressions |
 | Innovation & impact | Trial Ledger (hash chain; detects edits within an intact ledger, unsigned); upload-audit for other backtesters |
 | Technical feasibility | single-command run; Docker; CI; bounded public API; ~10-min seeded experiments |

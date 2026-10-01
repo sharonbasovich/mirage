@@ -24,7 +24,9 @@ def sharpe_ratio(returns: np.ndarray, periods_per_year: int = TRADING_DAYS) -> f
     if len(r) < 2:
         return 0.0
     sd = r.std(ddof=1)
-    if sd <= 0:
+    # a (near-)constant series has no usable variance — floor well below any
+    # real return dispersion rather than dividing by ~1e-19 noise
+    if sd <= 1e-10:
         return 0.0
     return float(r.mean() / sd * np.sqrt(periods_per_year))
 
@@ -86,13 +88,15 @@ def dsr(
     best_returns: np.ndarray,
     trial_sharpes: np.ndarray,
     periods_per_year: int = TRADING_DAYS,
+    n_trials: int | None = None,
 ) -> float:
     """Deflated Sharpe Ratio: PSR of the *selected* trial vs E[max SR] under H0.
 
     Returns a probability in [0, 1]; low values mean the best in-sample
-    result is consistent with luck across all trials.
+    result is consistent with luck across all trials.  ``n_trials`` is the
+    total number of trials in the search (default: the observed count).
     """
-    threshold = dsr_expected_max_sharpe(trial_sharpes)
+    threshold = dsr_expected_max_sharpe(trial_sharpes, n_trials=n_trials)
     return psr(best_returns, sr_benchmark=threshold, periods_per_year=periods_per_year)
 
 

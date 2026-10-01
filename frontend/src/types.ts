@@ -78,6 +78,7 @@ export interface Analysis {
   equity_curves: { dates: string[]; best: number[] };
   trials: TrialRow[];
   declared_trials?: number;
+  observed_trials?: number;
 }
 
 export interface ProgramInfo {
