@@ -57,6 +57,11 @@ function Shell({ children }: { children: ReactNode }) {
           </nav>
         </div>
       </header>
+      <div className="bg-amber-500/10 border-b border-amber-500/40 text-amber-200 text-xs sm:text-sm px-4 py-2 text-center">
+        Public demo — stored results are <b>temporary, shared and per-instance</b>:
+        saved programs, ledger entries and certificates can reset at any time.
+        Every run is computed live; nothing here is durable storage.
+      </div>
       <main className="max-w-7xl mx-auto px-4 py-6">{children}</main>
       <footer className="border-t border-edge mt-10 py-4 text-center text-xs text-dim">
         Research prototype for GIBC V2. Not a product, not a financial service,
