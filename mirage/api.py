@@ -554,9 +554,11 @@ if FRONTEND_DIST.exists():
     def spa(full_path: str) -> FileResponse:
         if full_path.startswith("api/"):
             raise HTTPException(404, "not found")
+        # index.html must not be cached: hashed /assets filenames change per build.
+        headers = {"Cache-Control": "no-cache"}
         candidate = (_dist / full_path).resolve()
         if (full_path and candidate.is_relative_to(_dist)
                 and candidate.exists() and candidate.is_file()):
-            return FileResponse(candidate)
-        return FileResponse(_dist / "index.html")
+            return FileResponse(candidate, headers=headers)
+        return FileResponse(_dist / "index.html", headers=headers)
 
