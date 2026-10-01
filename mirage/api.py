@@ -517,6 +517,7 @@ async def audit(
                 prep.returns, benchmark_returns=prep.benchmark,
                 assumed_cost_bps=cost_bps, periods_per_year=ppy,
                 declared_trials=n_trials,
+                frequency_verified=prep.has_dates,
             )
         except ValueError as exc:
             raise HTTPException(400, str(exc)) from exc

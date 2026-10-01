@@ -93,7 +93,7 @@ def audit(
         res = analyze_returns_matrix(
             prep.returns, benchmark_returns=prep.benchmark,
             assumed_cost_bps=cost_bps, periods_per_year=ppy,
-            declared_trials=trials,
+            declared_trials=trials, frequency_verified=prep.has_dates,
         )
     except ValueError as exc:
         typer.echo(str(exc), err=True)
@@ -104,7 +104,9 @@ def audit(
         "reality_check_p": res["reality_check_p"],
         "n_trials": res["n_trials"], "observed_trials": res["observed_trials"],
         "benchmark_dropped_rows": prep.benchmark_dropped,
+        "frequency_verified": res["frequency_verified"],
         "score": res["verdict"]["score"], "verdict": res["verdict"]["label"],
+        "label_capped": res["verdict"]["label_capped"],
         "narrative": res["verdict"]["narrative"],
     }
     typer.echo(json.dumps(out, indent=2))

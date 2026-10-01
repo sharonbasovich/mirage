@@ -16,9 +16,11 @@ from mirage.data import is_available, load_close, source_info
 
 MIN_AUDIT_ROWS = 64
 DATE_COLUMN_CANDIDATES = ("date", "timestamp", "time")
-# median spacing between uploaded dates (days) that identifies each frequency;
-# anything else (weekly, quarterly, irregular) is unsupported, not guessed at
-_FREQUENCY_SPACING_DAYS = {"daily": 3.0, "monthly": (20.0, 40.0)}
+# supported calendar contract: median spacing between uploaded dates must
+# sit inside one of these windows (days) — anything else (intraday, weekly,
+# quarterly, irregular) is unsupported, not guessed at.  Daily timestamps
+# must also normalize to distinct calendar days, monthly to distinct months.
+_FREQUENCY_SPACING_DAYS = {"daily": (0.9, 3.0), "monthly": (20.0, 40.0)}
 
 
 class AuditInputError(ValueError):
@@ -30,6 +32,7 @@ class PreparedAudit:
     returns: pd.DataFrame
     benchmark: pd.Series | None
     benchmark_dropped: int = 0  # uploaded rows outside benchmark coverage
+    has_dates: bool = False  # False -> the declared frequency is unverifiable
 
 
 def _date_column(df: pd.DataFrame, date_col: str | None) -> str | None:
@@ -48,11 +51,9 @@ def _median_spacing_days(dates: pd.DatetimeIndex) -> float:
 
 def _infer_frequency(dates: pd.DatetimeIndex) -> tuple[str | None, float]:
     med = _median_spacing_days(dates)
-    lo, hi = _FREQUENCY_SPACING_DAYS["monthly"]
-    if med <= _FREQUENCY_SPACING_DAYS["daily"]:
-        return "daily", med
-    if lo <= med <= hi:
-        return "monthly", med
+    for name, (lo, hi) in _FREQUENCY_SPACING_DAYS.items():
+        if lo <= med <= hi:
+            return name, med
     return None, med
 
 
@@ -145,16 +146,13 @@ def prepare_audit_frame(
             + " — remove them or convert values to decimal returns"
         )
 
-    nonempty = df.notna().any(axis=1)
-    df = df.loc[nonempty]
-    if dates is not None:
-        dates = dates[nonempty.to_numpy()]
     if df.shape[1] == 0 or len(df) == 0:
         raise AuditInputError("no numeric return columns found")
     bad_cols = [str(c) for c in df.columns[df.isna().any(axis=0)]]
     if bad_cols:
         raise AuditInputError(
-            "return columns contain missing values: "
+            "return columns contain missing values (blank cells or blank "
+            "rows are never silently filled or dropped): "
             + ", ".join(bad_cols[:5])
             + ("..." if len(bad_cols) > 5 else "")
         )
@@ -162,8 +160,10 @@ def prepare_audit_frame(
         raise AuditInputError("returns must be finite numbers")
     if (df.abs() >= 1.0).any().any():
         raise AuditInputError(
-            "returns must be decimals; values |r| >= 1 (>=100% per period) "
-            "look like percent units or price levels, not returns"
+            "values |r| >= 1 are outside the supported input range (decimal "
+            "simple returns, 0.01 = +1%); convert percent units or price "
+            "levels to decimal returns. Note this is a supported-range "
+            "restriction, not a claim that every >=100% return is invalid"
         )
     if df.shape[1] < 2:
         raise AuditInputError(
@@ -173,8 +173,32 @@ def prepare_audit_frame(
         )
     if len(df) < min_rows:
         raise AuditInputError(f"need at least {min_rows} rows of returns")
-    if not (df.std(ddof=1) > 1e-10).any():
-        raise AuditInputError("every return column is constant; nothing to audit")
+
+    # per-column numerical guards (each column is assessed independently):
+    eps_sd = np.sqrt(np.finfo(np.float64).eps)
+    col_sd = df.std(ddof=1)
+    near_const = [
+        str(c) for c in df.columns
+        if col_sd[c] <= eps_sd * max(abs(float(df[c].mean())),
+                                     float(df[c].abs().max()))
+    ]
+    if near_const:
+        raise AuditInputError(
+            "near-constant columns are outside the supported range (their "
+            "dispersion is below float64 cancellation scale): "
+            + ", ".join(near_const[:5])
+        )
+    extreme = [
+        str(c) for c in df.columns
+        if col_sd[c] > 0 and abs(float(df[c].mean())) / col_sd[c] >= 1.0
+    ]
+    if extreme:
+        raise AuditInputError(
+            "columns with per-period |mean|/sd >= 1 are near-riskless or "
+            "cash-like and outside this prototype's supported range (this "
+            "is a supported-input restriction, not a proof such returns are "
+            "impossible): " + ", ".join(extreme[:5])
+        )
     if declared_trials < df.shape[1]:
         raise AuditInputError(
             f"declared trial count {declared_trials} is smaller than the "
@@ -191,8 +215,19 @@ def prepare_audit_frame(
         inferred, med = _infer_frequency(dates)
         if inferred is None:
             raise AuditInputError(
-                f"uploaded dates have a median spacing of {med:.0f} days; "
-                "audits support daily or monthly returns"
+                f"uploaded dates have a median spacing of {med:.3g} days, "
+                "which is not a supported calendar — audits support daily "
+                "(~1 day spacing) or monthly (20-40 days) returns only"
+            )
+        # one row per period: two timestamps in the same day/month means
+        # intraday or duplicate-period data, not the declared frequency
+        periods = (dates.normalize() if inferred == "daily"
+                   else dates.to_period("M"))
+        if periods.has_duplicates:
+            unit = "day" if inferred == "daily" else "month"
+            raise AuditInputError(
+                f"multiple rows fall in the same {unit} — audits require "
+                "exactly one return per period"
             )
         if inferred != frequency:
             raise AuditInputError(
@@ -210,4 +245,5 @@ def prepare_audit_frame(
         df = df.iloc[keep]
         b.index = df.index
         bench = b
-    return PreparedAudit(returns=df, benchmark=bench, benchmark_dropped=dropped)
+    return PreparedAudit(returns=df, benchmark=bench,
+                         benchmark_dropped=dropped, has_dates=dates is not None)

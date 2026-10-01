@@ -102,25 +102,45 @@ pre-registration, but Mirage doesn't enforce it on its own.
 returns per tried configuration** (0.01 = +1%); a `date`/`timestamp`/`time`
 column is optional. Inputs are validated before any diagnostic runs and
 refused with an explicit error — never silently filled or guessed at — when
-they contain missing, blank, non-finite or non-numeric cells, all-constant
-columns, values |r| ≥ 1 (percent units or price levels, not decimal
-returns), fewer than 64 rows, fewer than 2 return columns, or a declared
-trial count below the uploaded column count. Percent strings like `1%` are
-rejected; not every mistaken unit is detectable, so check the file's units
-before uploading. A declared count above the uploaded columns extrapolates
-the luck threshold from the uploaded columns — the verdict narrative
-says so and notes unseen trials were not seen — and is refused when the
-uploaded Sharpes are near-identical (the cross-trial variance needed for
-the extrapolation is then unestimable). When dates are present, the declared
-`frequency` is checked against the actual date spacing (a monthly file
-labelled daily is refused).
+they contain missing, blank, non-finite or non-numeric cells (blank rows
+included: a 40-blank-row upload is refused, not trimmed), values |r| ≥ 1
+(a **supported-range restriction** — not a claim that every ≥100% return is
+impossible; convert percent units or price levels to decimals), columns that
+are near-constant (dispersion below float64 cancellation scale) or
+near-riskless (per-period |mean|/sd ≥ 1 — genuine cash-like series are
+outside this prototype's supported range), fewer than 64 rows, fewer than 2
+return columns, or a declared trial count below the uploaded column count.
+Percent strings like `1%` are rejected; not every mistaken unit is
+detectable, so check the file's units before uploading.
+
+A declared count above the uploaded columns extrapolates the luck threshold
+from the uploaded columns — the verdict narrative says so and notes unseen
+trials were not seen — and the label is **capped at Unclear** regardless of
+the heuristic score (which is still shown, flagged `label_capped`): an
+extrapolated DSR is assumption-dependent, and PBO/Reality Check use only the
+uploaded configurations, so a subset can never certify the unseen part of a
+search. Even a full-matrix Survives relies on a truthful declared count and
+uploading every tried configuration. The extrapolation itself is refused
+when the uploaded Sharpes are near-identical (cross-trial variance then
+unestimable). PBO over few uploaded columns is marked as a coarse estimate
+in the component detail.
+
+Dates follow a supported-calendar contract: median spacing must be ~1 day
+(0.9–3d, one row per calendar day) or monthly (20–40d, one row per month) —
+intraday, weekly, quarterly or irregular series are refused, as are
+duplicate normalized days/months. With dates present the declared
+`frequency` is verified against the data (a monthly file labelled daily is
+refused); **without dates the frequency is user-declared and unverifiable** —
+the result carries `frequency_verified: false`, a narrative note and a UI
+badge.
 
 An optional `benchmark` is inner-joined on the uploaded dates
 (month-aligned for monthly series) — never aligned by position. It requires
 a usable date column, ≥ 64 overlapping periods that are consecutive in the
 benchmark calendar, and a matching frequency; uploaded rows outside the
-benchmark's coverage are dropped and the count is reported. If any of that
-fails the audit is refused rather than silently omitting the benchmark.
+benchmark's coverage are dropped and the count is reported
+(`benchmark_dropped_rows`). If any of that fails the audit is refused rather
+than silently omitting the benchmark.
 
 ### Public API limits
 

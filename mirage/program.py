@@ -123,13 +123,17 @@ def analyze_trials(
     n_bootstrap: int = 500,
     seed: int = 0,
     declared_trials: int | None = None,
+    frequency_verified: bool = True,
 ) -> dict[str, Any]:
     """Full diagnostic battery + Mirage verdict over a set of recorded trials.
 
     ``declared_trials`` is the total number of trials in the search (the audit
     path): the multiple-testing universe every dependent output is computed
     against.  It must be at least the number of observed trials — declaring
-    fewer trials than were uploaded is contradictory input.
+    fewer trials than were uploaded is contradictory input.  When it exceeds
+    the observed count the label is capped at Unclear.  ``frequency_verified``
+    marks whether the declared frequency was checked against real dates;
+    undated uploads carry an explicit unverified-frequency note.
     """
     if not trials:
         raise ValueError("no trials to analyze")
@@ -212,7 +216,15 @@ def analyze_trials(
         period_unit="months" if ppy == 12 else "days",
         trial_count_label=trial_count_label,
         observed_trials=n_observed,
+        external_audit=declared_trials is not None,
     )
+    if not frequency_verified:
+        verdict.narrative.append(
+            "No date column was provided: the declared frequency "
+            f"({'monthly' if ppy == 12 else 'daily'}) is user-declared and "
+            "could not be verified against the data — returns were treated "
+            "as periods of that frequency as declared."
+        )
 
     eq = (1.0 + rets).cumprod()
     out = {
@@ -221,6 +233,7 @@ def analyze_trials(
         "n_days": n_days,
         "periods_per_year": ppy,
         "frequency": "monthly" if ppy == 12 else "daily",
+        "frequency_verified": frequency_verified,
         "best_index": best_i,
         "best_label": best.label,
         "best_config": best.config,
@@ -251,6 +264,7 @@ def analyze_trials(
         "verdict": {
             "score": verdict.score,
             "label": verdict.label,
+            "label_capped": verdict.capped,
             "components": [
                 {
                     "key": c.key,
@@ -295,6 +309,7 @@ def analyze_returns_matrix(
     seed: int = 0,
     periods_per_year: int = 252,
     declared_trials: int | None = None,
+    frequency_verified: bool = True,
 ) -> dict[str, Any]:
     """Analyze an externally supplied T x N returns matrix (the audit path).
 
@@ -332,4 +347,5 @@ def analyze_returns_matrix(
         n_bootstrap=n_bootstrap,
         seed=seed,
         declared_trials=declared_trials,
+        frequency_verified=frequency_verified,
     )

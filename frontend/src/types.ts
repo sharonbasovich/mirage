@@ -72,6 +72,7 @@ export interface Analysis {
   verdict: {
     score: number;
     label: string;
+    label_capped?: boolean;
     components: VerdictComponent[];
     narrative: string[];
   };
@@ -79,6 +80,7 @@ export interface Analysis {
   trials: TrialRow[];
   declared_trials?: number;
   observed_trials?: number;
+  frequency_verified?: boolean;
 }
 
 export interface ProgramInfo {

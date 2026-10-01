@@ -83,6 +83,22 @@ def test_declared_count_changes_score_and_label(client):
     assert a10k["verdict"]["label"] == "Unclear"
 
 
+def test_incomplete_upload_caps_label_at_unclear(client):
+    """declared > observed: even when the heuristic score clears the
+    Survives bar, a subset upload can never certify the unseen trials."""
+    df = _returns_frame()  # seed 0: raw score clears the bar when extrapolated
+    a = _post(client, df, 1000).json()["analysis"]
+    assert a["verdict"]["score"] >= 65          # heuristic score still shown
+    assert a["verdict"]["label"] == "Unclear"  # label is capped anyway
+    assert a["verdict"]["label_capped"] is True
+    assert any("capped at Unclear" in n for n in a["verdict"]["narrative"])
+
+    # declared == observed is a full-matrix audit: no cap
+    a_full = _post(client, df, 5).json()["analysis"]
+    assert a_full["verdict"]["label"] == "Survives"
+    assert a_full["verdict"]["label_capped"] is False
+
+
 def test_cli_audit_matches_api_path(tmp_path, client):
     df = _returns_frame(seed=2)
     p = tmp_path / "r.csv"
@@ -98,6 +114,67 @@ def test_cli_audit_matches_api_path(tmp_path, client):
 
 
 # --- contradictory / unestimable inputs are rejected, not absorbed ----------
+
+
+def _dated_rows(df: pd.DataFrame, dates, fmt: str = "%Y-%m-%d") -> pd.DataFrame:
+    out = df.copy()
+    out.insert(0, "Date", pd.DatetimeIndex(dates).strftime(fmt))
+    return out
+
+
+def test_blank_rows_rejected_not_dropped(client):
+    """40 fully blank rows must be an error, not a silent 300->260 trim."""
+    df = _returns_frame(rows=300)
+    df.loc[100:139, [f"s{i}" for i in range(5)]] = np.nan
+    r = _post(client, df, 50)
+    assert r.status_code == 400
+    assert "missing values" in r.json()["detail"]
+
+
+def test_intraday_and_offcalendar_dates_rejected(client):
+    """Only daily (~1d spacing) or monthly (20-40d) uploads are supported."""
+    base = _returns_frame(rows=300, dates=False)
+    for freq, name in (("h", "hourly"), ("min", "minute"), ("W", "weekly")):
+        d = pd.date_range("2024-01-01", periods=300, freq=freq)
+        r = _post(client, _dated_rows(base, d, "%Y-%m-%d %H:%M"), 10)
+        assert r.status_code == 400, name
+        assert "supported calendar" in r.json()["detail"], name
+
+    # two timestamps inside one day -> intraday, not daily
+    d = pd.DatetimeIndex(
+        list(pd.bdate_range("2020-01-01", periods=299)) + [pd.Timestamp("2020-01-01")])
+    r = _post(client, _dated_rows(base, d), 10)
+    assert r.status_code == 400
+
+
+def test_per_column_numerical_guards(client):
+    """Each column is assessed: a near-constant column mixed among real ones
+    is a supported-range rejection, and |mean|/sd >= 1 is near-riskless."""
+    df = _returns_frame(rows=300, dates=False, cols=4)
+    df["const"] = 0.001
+    r = _post(client, df, 50)
+    assert r.status_code == 400
+    assert "near-constant" in r.json()["detail"]
+
+    rng = np.random.default_rng(0)
+    df = _returns_frame(rows=300, dates=False, cols=4)
+    df["cash"] = 0.001 + rng.normal(0, 1e-8, 300)
+    r = _post(client, df, 50)
+    assert r.status_code == 400
+    assert "near-riskless" in r.json()["detail"]
+
+
+def test_undated_frequency_disclosed_as_unverified(client):
+    df = _returns_frame(dates=False)
+    r = _post(client, df, 5, frequency="daily")
+    assert r.status_code == 200, r.text
+    a = r.json()["analysis"]
+    assert a["frequency_verified"] is False
+    assert any("could not be verified" in n for n in a["verdict"]["narrative"])
+
+    # dated uploads verify the frequency
+    a2 = _post(client, _returns_frame(dates=True), 5).json()["analysis"]
+    assert a2["frequency_verified"] is True
 
 
 def test_declared_below_observed_rejected(client):
@@ -141,7 +218,7 @@ def test_non_numeric_and_wrong_unit_columns_rejected(client):
     df.loc[11, "s2"] = -1.5  # not decimal returns; refuse, don't truncate
     r = _post(client, df, 50)
     assert r.status_code == 400
-    assert "decimals" in r.json()["detail"]
+    assert "supported input range" in r.json()["detail"]
 
 
 def test_degenerate_sharpe_variance_blocks_extrapolation(client):

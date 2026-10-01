@@ -82,6 +82,7 @@ export default function Verdict() {
             ? `${a.observed_trials} uploaded trial columns · ${a.declared_trials} declared trials`
             : `${a.n_trials} recorded trials`}{" "}
           · {a.n_days} {unit}
+          {a.frequency_verified === false && " · frequency unverified (no dates)"}
         </span>
       </div>
 
@@ -95,11 +96,14 @@ export default function Verdict() {
               "Mixed evidence — inspect components before trusting this backtest."}
             {v.label === "Survives" &&
               "The best result holds up under the diagnostic battery."}
+            {v.label === "Unclear" && v.label_capped &&
+              " The heuristic score cleared the Survives bar but the label was capped — see the read below for the reason."}
           </p>
         </div>
         <div className="card">
           <h2 className="font-bold mb-3">Component table</h2>
-          <table className="data">
+          <div className="overflow-x-auto">
+            <table className="data">
             <thead>
               <tr>
                 <th>Component</th>
@@ -118,7 +122,8 @@ export default function Verdict() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         </div>
       </div>
 

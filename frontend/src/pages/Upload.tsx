@@ -63,9 +63,13 @@ export default function Upload() {
         <h1 className="text-xl font-bold mb-1">Audit an external backtest</h1>
         <p className="text-sm text-dim mb-5">
           Built your strategy in another tool? Upload a CSV of daily or monthly returns —
-          one column per tried configuration — and declare how many total
+          one column per tried configuration, decimal simple returns
+          (0.01 = +1%), optional Date column — and declare how many total
           parameter combinations you searched. Mirage runs the same diagnostic
-          battery and verdict.
+          battery and verdict. Unsupported inputs (blank cells, non-numeric
+          columns, values |r| ≥ 1, near-constant or near-riskless columns,
+          off-calendar dates) are refused with an explicit error rather than
+          guessed at.
         </p>
         <div className="space-y-4">
           <div>
@@ -139,7 +143,10 @@ export default function Upload() {
         Deflated Sharpe Ratio rescales to whatever number you report. If you
         upload fewer columns than you declare, the luck threshold is
         extrapolated from the uploaded subset — trials you didn't upload were
-        not seen. That is exactly why the Trial Ledger exists: inside Mirage,
+        not seen — and because a subset can never certify unseen trials, such
+        audits are capped at Unclear no matter how strong the numbers look.
+        Without a Date column, the declared frequency can't be verified either.
+        That is exactly why the Trial Ledger exists: inside Mirage,
         the count is the ledger's, not yours.
       </div>
     </div>
