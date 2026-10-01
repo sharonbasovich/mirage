@@ -1,8 +1,8 @@
 """ASGI entrypoint for deployment: `uvicorn app.main:app`."""
 from fastapi import FastAPI
 
-from mirage.api import app as app
+from mirage.api import app as _app
 
-assert isinstance(app, FastAPI)
+app: FastAPI = _app
 
 __all__ = ["app"]
