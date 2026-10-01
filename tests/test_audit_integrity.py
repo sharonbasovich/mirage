@@ -14,6 +14,7 @@ from typer.testing import CliRunner
 
 from mirage import api, cli
 from mirage.diagnostics.sharpe import dsr_expected_max_sharpe, psr, sharpe_ratio
+from mirage.diagnostics.verdict import build_verdict
 from mirage.program import analyze_returns_matrix
 
 
@@ -97,6 +98,20 @@ def test_incomplete_upload_caps_label_at_unclear(client):
     a_full = _post(client, df, 5).json()["analysis"]
     assert a_full["verdict"]["label"] == "Survives"
     assert a_full["verdict"]["label_capped"] is False
+
+
+def test_subset_caveat_present_even_when_rc_caps_first():
+    """When Reality Check already caps the label, the incomplete-trial
+    explanation must still appear — score/label/diagnostics unchanged."""
+    v = build_verdict(
+        dsr_p=0.99, pbo=0.1, is_sharpe=1.0, oos_sharpe_median=1.0,
+        breakeven_bps=50.0, assumed_cost_bps=5.0, n_days=500, min_btl=100,
+        n_trials=1000, rc_p=0.6, external_audit=True, observed_trials=5,
+    )
+    assert v.label == "Unclear" and v.score >= 65 and v.capped
+    assert any("Reality Check" in n and "capped" in n for n in v.narrative)
+    assert any("only a subset of the declared search" in n
+               for n in v.narrative)
 
 
 def test_cli_audit_matches_api_path(tmp_path, client):

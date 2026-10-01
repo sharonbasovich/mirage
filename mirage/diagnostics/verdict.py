@@ -196,19 +196,25 @@ def build_verdict(
             "insufficient evidence of outperformance versus the benchmark - "
             "label capped at Unclear."
         )
-    if (label == "Survives" and external_audit
-            and observed_trials is not None and observed_trials < n_trials):
-        label = "Unclear"
-        capped = True
-        narrative.append(
-            f"Label capped at Unclear (the heuristic score {score:.1f} is "
-            "still shown): the uploaded columns are only a subset of the "
+    if (external_audit and observed_trials is not None
+            and observed_trials < n_trials):
+        subset_reason = (
+            "the uploaded columns are only a subset of the "
             "declared search. The extrapolated DSR is assumption-dependent "
             "and PBO / Reality Check used only the uploaded configurations, "
             "so a subset can never certify the unseen trials. Even a "
             "full-matrix Survives relies on a truthful declared count and "
             "uploading every tried configuration."
         )
+        if label == "Survives":
+            label = "Unclear"
+            capped = True
+            narrative.append(
+                f"Label capped at Unclear (the heuristic score {score:.1f} "
+                f"is still shown): {subset_reason}"
+            )
+        else:
+            narrative.append(f"Incomplete-trial caveat: {subset_reason}")
     if not narrative:
         narrative.append("Diagnostics are mixed; inspect the component table before acting.")
     return Verdict(score=round(score, 1), label=label, components=comps,

@@ -48,7 +48,7 @@ Prerequisites: Python ≥ 3.11, Node ≥ 20 (only for the web UI), ~2 GB disk.
 git clone https://github.com/sharonbasovich/mirage.git && cd mirage
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"          # core lib, CLI, API, dev tools
-pytest                            # 77 tests, offline (bundled World Bank data + synthetic)
+pytest                            # 83 tests, offline (bundled World Bank data + synthetic)
 ```
 
 Run the full web app (serves the built frontend from FastAPI, single origin):
@@ -102,8 +102,10 @@ pre-registration, but Mirage doesn't enforce it on its own.
 returns per tried configuration** (0.01 = +1%); a `date`/`timestamp`/`time`
 column is optional. Inputs are validated before any diagnostic runs and
 refused with an explicit error — never silently filled or guessed at — when
-they contain missing, blank, non-finite or non-numeric cells (blank rows
-included: a 40-blank-row upload is refused, not trimmed), values |r| ≥ 1
+they contain missing, blank, non-finite or non-numeric cells (truly empty
+lines are skipped by the CSV parser, but comma-only rows and any missing
+return cell are refused — a 40-blank-row upload is refused, not trimmed),
+values |r| ≥ 1
 (a **supported-range restriction** — not a claim that every ≥100% return is
 impossible; convert percent units or price levels to decimals), columns that
 are near-constant (dispersion below float64 cancellation scale) or
@@ -256,7 +258,7 @@ mirage/                 core package
   cli.py                `mirage` CLI (typer)
 experiments/            E1-E4 self-validation (seeded, -> reports/)
 frontend/               React + Vite + TS + Tailwind + Recharts
-tests/                  pytest suite (77 tests, incl. API abuse regressions)
+tests/                  pytest suite (83 tests, incl. API abuse regressions)
 data/worldbank/         bundled World Bank Pink Sheet subset (CC BY 4.0)
 scripts/fetch_data.py   user-local Yahoo fetch (not redistributed)
 scripts/fetch_worldbank.py  rebuilds the World Bank subset from the official workbook
