@@ -29,6 +29,12 @@ data = ["yfinance==0.2.66", "openpyxl==3.1.5"]
 [project.scripts]
 mirage = "mirage.cli:app"
 
+[tool.vercel]
+entrypoint = "app.main:app"
+
+[tool.vercel.scripts]
+build = "cd frontend && npm ci && npm run build"
+
 [tool.setuptools.packages.find]
 include = ["mirage*", "app*"]
 

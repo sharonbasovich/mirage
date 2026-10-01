@@ -18,6 +18,7 @@ import json
 import os
 import re
 import sqlite3
+import tempfile
 import time
 import uuid
 from dataclasses import dataclass
@@ -28,7 +29,15 @@ from typing import Any
 def state_dir() -> Path:
     """Writable state (ledger + stored analyses): $MIRAGE_STATE_DIR or ~/.local/share/mirage."""
     env = os.environ.get("MIRAGE_STATE_DIR")
-    return Path(env) if env else Path.home() / ".local" / "share" / "mirage"
+    if env:
+        return Path(env)
+    default = Path.home() / ".local" / "share" / "mirage"
+    try:
+        default.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        # Read-only filesystems (e.g. serverless functions): fall back to /tmp.
+        return Path(tempfile.gettempdir()) / "mirage"
+    return default
 
 
 def default_db() -> Path:
