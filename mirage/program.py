@@ -122,10 +122,34 @@ def analyze_trials(
     n_blocks: int = 16,
     n_bootstrap: int = 500,
     seed: int = 0,
+    declared_trials: int | None = None,
+    frequency_verified: bool = True,
 ) -> dict[str, Any]:
-    """Full diagnostic battery + Mirage verdict over a set of recorded trials."""
+    """Full diagnostic battery + Mirage verdict over a set of recorded trials.
+
+    ``declared_trials`` is the total number of trials in the search (the audit
+    path): the multiple-testing universe every dependent output is computed
+    against.  It must be at least the number of observed trials — declaring
+    fewer trials than were uploaded is contradictory input.  When it exceeds
+    the observed count the label is capped at Unclear.  ``frequency_verified``
+    marks whether the declared frequency was checked against real dates;
+    undated uploads carry an explicit unverified-frequency note.
+    """
     if not trials:
         raise ValueError("no trials to analyze")
+
+    n_observed = len(trials)
+    if declared_trials is None:
+        n_trials = n_observed
+        trial_count_label = "recorded"
+    else:
+        n_trials = int(declared_trials)
+        trial_count_label = "declared"
+        if n_trials < n_observed:
+            raise ValueError(
+                f"declared trial count {n_trials} is smaller than the "
+                f"{n_observed} observed return series"
+            )
 
     ppy = trials[0].periods_per_year
     rets = pd.DataFrame({t.label: t.returns for t in trials}).fillna(0.0)
@@ -137,9 +161,17 @@ def analyze_trials(
     best_rets = best.returns.to_numpy()
     best_is_sharpe = float(trial_sharpes[best_i])
 
-    dsr_p = dsr(best_rets, trial_sharpes, periods_per_year=ppy)
+    if n_trials > n_observed and np.std(trial_sharpes, ddof=1) < 1e-3:
+        raise ValueError(
+            f"cannot extrapolate the luck threshold to {n_trials} declared "
+            f"trials: the {n_observed} observed series have near-identical "
+            "Sharpes, so the cross-trial variance is unestimable — upload "
+            "more of the tried configurations or declare the observed count"
+        )
+
+    dsr_p = dsr(best_rets, trial_sharpes, periods_per_year=ppy, n_trials=n_trials)
     psr_p = psr(best_rets, periods_per_year=ppy)
-    e_max = dsr_expected_max_sharpe(trial_sharpes)
+    e_max = dsr_expected_max_sharpe(trial_sharpes, n_trials=n_trials)
     min_btl = min_backtest_length(best_rets, periods_per_year=ppy)
 
     # per-trial PSR p-values -> multiple-testing haircuts
@@ -178,18 +210,30 @@ def analyze_trials(
         assumed_cost_bps=assumed_cost_bps,
         n_days=n_days,
         min_btl=min_btl,
-        n_trials=len(trials),
+        n_trials=n_trials,
         rc_p=rc_p,
         breakeven_capped=frag.capped,
         period_unit="months" if ppy == 12 else "days",
+        trial_count_label=trial_count_label,
+        observed_trials=n_observed,
+        external_audit=declared_trials is not None,
     )
+    if not frequency_verified:
+        verdict.narrative.append(
+            "No date column was provided: the declared frequency "
+            f"({'monthly' if ppy == 12 else 'daily'}) is user-declared and "
+            "could not be verified against the data — returns were treated "
+            "as periods of that frequency as declared."
+        )
 
     eq = (1.0 + rets).cumprod()
-    return {
-        "n_trials": len(trials),
+    out = {
+        "n_trials": n_trials,
+        "observed_trials": n_observed,
         "n_days": n_days,
         "periods_per_year": ppy,
         "frequency": "monthly" if ppy == 12 else "daily",
+        "frequency_verified": frequency_verified,
         "best_index": best_i,
         "best_label": best.label,
         "best_config": best.config,
@@ -220,6 +264,7 @@ def analyze_trials(
         "verdict": {
             "score": verdict.score,
             "label": verdict.label,
+            "label_capped": verdict.capped,
             "components": [
                 {
                     "key": c.key,
@@ -250,6 +295,9 @@ def analyze_trials(
             for t in trials
         ],
     }
+    if declared_trials is not None:
+        out["declared_trials"] = n_trials
+    return out
 
 
 def analyze_returns_matrix(
@@ -260,6 +308,8 @@ def analyze_returns_matrix(
     n_bootstrap: int = 500,
     seed: int = 0,
     periods_per_year: int = 252,
+    declared_trials: int | None = None,
+    frequency_verified: bool = True,
 ) -> dict[str, Any]:
     """Analyze an externally supplied T x N returns matrix (the audit path).
 
@@ -296,4 +346,6 @@ def analyze_returns_matrix(
         n_blocks=n_blocks,
         n_bootstrap=n_bootstrap,
         seed=seed,
+        declared_trials=declared_trials,
+        frequency_verified=frequency_verified,
     )

@@ -187,9 +187,11 @@ world-bank-pink-sheet · docker · github-actions · **devin (cognition-ai)**
 
 ## AI assistance disclosure
 
-Substantially all code, documentation, and the demo video script were drafted
-with Devin (Cognition AI) under human direction: the human defined the scope,
-reviewed the output, and directed testing.
+Substantially all code, documentation, and the demo video script were
+implemented and reviewed by AI agents (Devin, Cognition AI) under the owner's
+authorization and direction: the owner defined the scope and requirements and
+authorized the work, while design, implementation, review and testing were
+AI-led.
 
 ## Disclaimer
 

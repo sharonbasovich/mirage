@@ -76,12 +76,17 @@ export default function Verdict() {
         <h1 className="text-xl font-bold">Autopsy report</h1>
         <span className="text-xs text-dim font-mono">{programId}</span>
         <span className="text-xs text-dim">
-          {a.n_trials} recorded trials · {a.n_days} {unit}
-          {a.declared_trials ? ` · ${a.declared_trials} declared` : ""}
+          {a.declared_trials != null &&
+          a.observed_trials != null &&
+          a.declared_trials > a.observed_trials
+            ? `${a.observed_trials} uploaded trial columns · ${a.declared_trials} declared trials`
+            : `${a.n_trials} recorded trials`}{" "}
+          · {a.n_days} {unit}
+          {a.frequency_verified === false && " · frequency unverified (no dates)"}
         </span>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
         <div className="card flex flex-col items-center justify-center">
           <ScoreGauge score={v.score} label={v.label} />
           <p className="text-xs text-dim text-center mt-4 leading-relaxed">
@@ -91,11 +96,14 @@ export default function Verdict() {
               "Mixed evidence — inspect components before trusting this backtest."}
             {v.label === "Survives" &&
               "The best result holds up under the diagnostic battery."}
+            {v.label === "Unclear" && v.label_capped &&
+              " The heuristic score cleared the Survives bar but the label was capped — see the read below for the reason."}
           </p>
         </div>
-        <div className="card">
+        <div className="card min-w-0">
           <h2 className="font-bold mb-3">Component table</h2>
-          <table className="data">
+          <div className="overflow-x-auto">
+            <table className="data">
             <thead>
               <tr>
                 <th>Component</th>
@@ -114,7 +122,8 @@ export default function Verdict() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -130,7 +139,7 @@ export default function Verdict() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label="Best IS Sharpe" value={a.best_sharpe.toFixed(2)}
           hint={`PSR (vs 0) = ${pct(a.psr)}`} />
         <Stat label="DSR confidence" value={pct(a.dsr)}
@@ -141,7 +150,7 @@ export default function Verdict() {
           hint={a.reality_check_p != null ? `Reality Check p = ${a.reality_check_p.toFixed(2)}` : "no benchmark"} />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="card">
           <h2 className="font-bold mb-1">Equity curve — in-sample winner</h2>
           <p className="text-xs text-dim mb-3">net of costs, full sample</p>

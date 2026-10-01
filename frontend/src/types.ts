@@ -72,12 +72,15 @@ export interface Analysis {
   verdict: {
     score: number;
     label: string;
+    label_capped?: boolean;
     components: VerdictComponent[];
     narrative: string[];
   };
   equity_curves: { dates: string[]; best: number[] };
   trials: TrialRow[];
   declared_trials?: number;
+  observed_trials?: number;
+  frequency_verified?: boolean;
 }
 
 export interface ProgramInfo {
