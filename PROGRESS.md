@@ -6,9 +6,14 @@
   reproducible result files through `5a75fcf`. The Devin
   hardening and submission-audit commits were imported from verified Git
   bundles and pushed after independent QA.
-- Tests: 54 passing (33 core + 21 API abuse regressions); ruff, mypy, tsc clean.
-- Deploy: Devin built-in backend deploy (free) is **pending approval**. No live
-  URL yet.
+- Tests: 56 passing (33 core + 21 API abuse regressions + 2 deploy-entrypoint
+  regressions); ruff, mypy, tsc clean.
+- Deploy: **no public app was deployed**. Devin's built-in free backend deploy
+  was approved and retried but failed at app detection on every attempt with
+  "Check that the project has a pyproject.toml and a FastAPI app", even though
+  the documented requirements are met (`pyproject.toml` with a project name +
+  a FastAPI app named `app` in `app/main.py`). The project serves locally via
+  `uvicorn app.main:app`; no live URL exists.
 - Devpost: **submitted and live** — https://devpost.com/software/mirage-1vh78d
 - Demo video: hosted at https://www.youtube.com/watch?v=Q3b8egv8syM
 
@@ -32,9 +37,10 @@
 - DSR/PSR labelled as confidence (exceedance) estimates, not p-values; RC p > 0.5 described as insufficient evidence of outperformance
 
 ## Pending
-- [ ] Optional: approve deploy, smoke-test, and insert the URL if a live demo
-  would help judges; the rules require a running prototype and hosted video,
-  not a public live-app URL
+- [x] Attempt the free Devin backend deploy — approved and retried; failed at
+  app detection (platform-side check rejects a valid FastAPI project). No
+  public live URL; the rules require a running prototype and hosted video,
+  not a public live-app URL.
 - [x] Host the 3:03 demo on YouTube — https://www.youtube.com/watch?v=Q3b8egv8syM
 - [x] Submit the Devpost entry — https://devpost.com/software/mirage-1vh78d
 - [ ] Optional: purge the old Yahoo CSVs from git history (history rewrite + force push; human decision)

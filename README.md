@@ -32,7 +32,9 @@ and detection power, and report ROC curves.
 
 - **Devpost:** https://devpost.com/software/mirage-1vh78d (submitted, GIBC V2 Track 02)
 - **Demo video:** https://www.youtube.com/watch?v=Q3b8egv8syM (3:03, narrated)
-- **Live app:** not deployed yet (the free Devin backend deploy is waiting for approval)
+- **Live app:** not deployed. Attempts to host the backend via Devin's built-in free
+  deploy failed at app detection (see `PROGRESS.md` → Deploy); run it locally
+  with `uvicorn app.main:app` instead.
 - **Source:** https://github.com/sharonbasovich/mirage
 - **Screenshots:** `submission/screenshots/`
 - **Experiment figures:** `reports/figures/`
